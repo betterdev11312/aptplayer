@@ -269,6 +269,10 @@ python -m PyInstaller AptPlayer.spec --noconfirm --clean
 copy dist\AptPlayer.exe site\AptPlayer.exe
 ```
 
+## Desenvolvimento
+
+O projeto usa git. Para publicar no GitHub, veja [GITHUB.md](GITHUB.md).
+
 ## Notas
 
 - **Streams expiram.** As URLs do YouTube valem algumas horas; o app resolve
