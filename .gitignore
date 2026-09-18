@@ -1,0 +1,31 @@
+# --- Python ---
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+
+# --- Builds do PyInstaller ---
+build/
+dist/
+*.spec.bak
+
+# --- Seus dados pessoais (biblioteca, cache, capas, sessao) ---
+data/
+
+# --- Executaveis: grandes demais para o Git ---
+# Ficam no site publicado; quem quiser recompila com o PyInstaller.
+*.exe
+site/AptPlayer.exe
+site/AptPlayer-Setup.exe
+
+# --- Segredos ---
+# core/account.py leva as chaves do Supabase depois de configurado.
+# A chave anon e publica por design, mas nao ha motivo para versiona-la.
+.env
+secrets.json
+
+# --- Sistema ---
+Thumbs.db
+desktop.ini
+.DS_Store

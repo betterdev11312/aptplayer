@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>AptPlayer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Chakra+Petch:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Rajdhani:wght@500;600;700&family=Share+Tech+Mono&family=VT323&family=Press+Start+2P&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="themes.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="app">
+
+  <!-- ===== SIDEBAR ===== -->
+  <aside class="sidebar">
+    <div class="brand">
+      <img src="../icon/app.png" alt="" class="brand-icon" onerror="this.style.display='none'">
+      <span class="brand-name" data-text="AptPlayer">AptPlayer</span>
+    </div>
+
+    <nav class="nav">
+      <button class="nav-item active" data-view="home">
+        <svg viewBox="0 0 24 24"><path d="M4 11 12 4l8 7v8a1 1 0 0 1-1 1h-4v-6H9v6H5a1 1 0 0 1-1-1z"/></svg>
+        Início
+      </button>
+      <button class="nav-item" data-view="search">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        Buscar
+      </button>
+      <button class="nav-item" data-view="library">
+        <svg viewBox="0 0 24 24"><path d="M4 19V5m5 14V5m6 14V8l5 11"/></svg>
+        Biblioteca
+      </button>
+      <button class="nav-item" data-view="favorites">
+        <svg viewBox="0 0 24 24"><path d="M12 20s-7-4.5-7-9a4 4 0 0 1 7-2.6A4 4 0 0 1 19 11c0 4.5-7 9-7 9z"/></svg>
+        Favoritas
+      </button>
+      <button class="nav-item" data-view="history">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></svg>
+        Histórico
+      </button>
+      <button class="nav-item" data-view="chat">
+        <svg viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-11.6 7.1L3 21l1.9-6.4A8 8 0 1 1 21 12z"/></svg>
+        Chat IA
+      </button>
+      <button class="nav-item" data-view="ai">
+        <svg viewBox="0 0 24 24"><path d="M12 3v3m0 12v3M3 12h3m12 0h3M5.6 5.6l2.1 2.1m8.6 8.6 2.1 2.1m0-12.8-2.1 2.1m-8.6 8.6-2.1 2.1"/></svg>
+        Ferramentas IA
+      </button>
+      <button class="nav-item" data-view="settings">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-2.9 1.2V21a2 2 0 1 1-4 0v-.1A1.7 1.7 0 0 0 7 19.4a1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0-1.2-2.9H1a2 2 0 1 1 0-4h.1A1.7 1.7 0 0 0 2.6 7a1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H7a1.7 1.7 0 0 0 1-1.5V1a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 2.9 1.2 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V7a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
+        Ajustes
+      </button>
+    </nav>
+
+    <div class="section-head">
+      <span>Playlists</span>
+      <button id="new-playlist" title="Nova playlist">+</button>
+    </div>
+    <div class="playlists" id="playlist-list"></div>
+
+    <div class="sidebar-foot" id="cache-info"></div>
+  </aside>
+
+  <!-- ===== MAIN ===== -->
+  <main class="main">
+
+    <!-- INÍCIO -->
+    <section class="view active" id="view-home">
+      <header class="view-head">
+        <div>
+          <h1 id="home-greeting">Iní<span>cio</span></h1>
+          <p class="sub">O que você quer ouvir hoje?</p>
+        </div>
+        <div class="head-actions">
+          <button class="btn" id="home-refresh" title="Atualizar sugestões">↻ Atualizar</button>
+        </div>
+      </header>
+
+      <div class="chips" id="home-chips"></div>
+      <div id="home-sections"></div>
+    </section>
+
+    <!-- CATEGORIA -->
+    <section class="view" id="view-category">
+      <header class="view-head">
+        <div>
+          <div class="pl-kicker">// Categoria</div>
+          <h1 id="category-title">—</h1>
+        </div>
+        <div class="head-actions">
+          <button class="btn primary" id="category-play">▶ Tocar tudo</button>
+          <button class="btn" id="category-radio">((•)) Rádio</button>
+          <button class="btn ghost" id="category-back">Voltar</button>
+        </div>
+      </header>
+      <div id="category-tracks" class="track-list"></div>
+    </section>
+
+    <!-- BUSCAR -->
+    <section class="view" id="view-search">
+      <header class="view-head">
+        <div>
+          <h1>Bus<span>car</span></h1>
+          <p class="sub">Filtro de música ativo — vlogs e gameplays são descartados</p>
+        </div>
+      </header>
+      <div class="searchbar">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input id="search-input" type="text" placeholder="artista, música ou link do YouTube" autocomplete="off">
+        <span class="search-tag">MUSIC ONLY</span>
+      </div>
+      <div id="search-results" class="track-list"></div>
+    </section>
+
+    <!-- BIBLIOTECA -->
+    <section class="view" id="view-library">
+      <header class="view-head">
+        <div><h1>Biblio<span>teca</span></h1></div>
+        <div class="head-actions">
+          <select id="library-order" class="select">
+            <option value="recent">Recentes</option>
+            <option value="played">Mais tocadas</option>
+            <option value="title">Título (A-Z)</option>
+            <option value="artist">Artista (A-Z)</option>
+          </select>
+        </div>
+      </header>
+      <div id="library-list" class="track-list"></div>
+    </section>
+
+    <!-- FAVORITAS -->
+    <section class="view" id="view-favorites">
+      <header class="view-head"><div><h1>Favo<span>ritas</span></h1></div></header>
+      <div id="favorites-list" class="track-list"></div>
+    </section>
+
+    <!-- HISTÓRICO -->
+    <section class="view" id="view-history">
+      <header class="view-head"><div><h1>His<span>tórico</span></h1></div></header>
+      <div id="history-list" class="track-list"></div>
+    </section>
+
+    <!-- PLAYLIST -->
+    <section class="view" id="view-playlist">
+      <div class="pl-header">
+        <div class="pl-header-cover" id="pl-cover-box" title="Clique para trocar a capa"></div>
+        <div class="pl-header-info">
+          <div class="pl-kicker">// Playlist</div>
+          <h1 id="playlist-title">—</h1>
+          <div class="pl-stats" id="playlist-stats"></div>
+          <div class="pl-actions">
+            <button class="btn primary" id="play-playlist">▶ Tocar tudo</button>
+            <button class="btn" id="shuffle-playlist">⤮ Aleatório</button>
+            <button class="btn" id="download-playlist">⬇ Baixar tudo</button>
+            <button class="btn" id="rename-playlist">Renomear</button>
+            <button class="btn" id="change-cover">Capa</button>
+            <button class="btn danger" id="delete-playlist">Excluir</button>
+          </div>
+        </div>
+      </div>
+      <div id="playlist-tracks" class="track-list"></div>
+    </section>
+
+    <!-- CHAT IA -->
+    <section class="view" id="view-chat">
+      <header class="view-head">
+        <div>
+          <h1>Chat <span>IA</span></h1>
+          <p class="sub" id="chat-status">Conectando ao Ollama...</p>
+        </div>
+        <div class="head-actions">
+          <button class="btn" id="clear-chat">Limpar</button>
+        </div>
+      </header>
+
+      <div class="chat-wrap">
+        <div class="chat-log" id="chat-log"></div>
+        <div class="chat-input">
+          <input id="chat-text" type="text" placeholder="pergunte sobre música, peça recomendações..." autocomplete="off">
+          <button class="btn primary" id="chat-send">Enviar</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- FERRAMENTAS IA -->
+    <section class="view" id="view-ai">
+      <header class="view-head">
+        <div>
+          <h1>Ferra<span>mentas</span></h1>
+          <p class="sub" id="ai-status">Verificando Ollama...</p>
+        </div>
+      </header>
+
+      <div class="ai-grid">
+        <div class="ai-card">
+          <h3>Busca inteligente</h3>
+          <p>Descreva o que quer ouvir e a IA encontra no YouTube.</p>
+          <input id="ai-search-input" type="text" placeholder="algo tipo Pink Floyd mas mais pesado">
+          <button class="btn primary" id="ai-search-btn">Buscar</button>
+        </div>
+
+        <div class="ai-card">
+          <h3>Gerar playlist</h3>
+          <p>Monta uma playlist a partir da sua biblioteca.</p>
+          <input id="ai-playlist-input" type="text" placeholder="música pra codar de madrugada">
+          <button class="btn primary" id="ai-playlist-btn">Gerar</button>
+        </div>
+
+        <div class="ai-card">
+          <h3>Importar do Spotify</h3>
+          <p>Cole o link de uma playlist ou álbum público. Cada faixa é
+             procurada no YouTube.</p>
+          <input id="spotify-url" type="text" placeholder="https://open.spotify.com/playlist/...">
+          <button class="btn primary" id="spotify-btn">Importar</button>
+        </div>
+
+        <div class="ai-card">
+          <h3>Organizar</h3>
+          <p>Classifica gênero e clima das faixas sem tag.</p>
+          <button class="btn primary" id="ai-tag-btn">Classificar</button>
+        </div>
+      </div>
+
+      <div id="ai-results" class="track-list"></div>
+    </section>
+
+    <!-- AJUSTES -->
+    <section class="view" id="view-settings">
+      <header class="view-head">
+        <div>
+          <h1>Ajus<span>tes</span></h1>
+          <p class="sub">Escolha a cara do seu player</p>
+        </div>
+      </header>
+
+      <div class="section-title">// Temas</div>
+      <div class="theme-grid" id="theme-grid"></div>
+
+      <div class="section-title" style="margin-top:28px">// Conta</div>
+      <div class="ai-grid">
+        <div class="ai-card" id="account-card">
+          <h3 id="account-title">Conta</h3>
+          <p id="account-desc">Verificando...</p>
+          <div id="account-forms"></div>
+        </div>
+        <div class="ai-card">
+          <h3>Backup em arquivo</h3>
+          <p>Funciona sem conta: salva playlists e favoritas num arquivo que
+             você guarda onde quiser.</p>
+          <button class="btn" id="export-backup">Exportar</button>
+          <button class="btn" id="import-backup">Importar</button>
+        </div>
+      </div>
+
+      <div class="section-title" style="margin-top:28px">// Sobre</div>
+      <div class="ai-grid">
+        <div class="ai-card">
+          <h3>Versão</h3>
+          <p id="about-version">—</p>
+          <button class="btn" id="check-update">Procurar atualização</button>
+        </div>
+        <div class="ai-card">
+          <h3>Diagnóstico</h3>
+          <p id="about-diag">—</p>
+          <button class="btn" id="copy-diag">Copiar detalhes</button>
+        </div>
+      </div>
+
+      <div class="section-title" style="margin-top:28px">// Mascote</div>
+      <div class="ai-grid">
+        <div class="ai-card">
+          <h3>Byte, o gato</h3>
+          <p>Ele anda pela tela, comenta o que você faz e responde quando
+             você clica nele. Se não entender a pergunta, foge.</p>
+          <label class="switch">
+            <input type="checkbox" id="cat-toggle" checked>
+            <span>Mostrar o mascote</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="section-title" style="margin-top:28px">// Rádio</div>
+      <div class="ai-grid">
+        <div class="ai-card">
+          <h3>Usar IA no rádio</h3>
+          <p>Além do mix do YouTube, a IA sugere músicas parecidas analisando
+             gênero e clima. Desligue se quiser um rádio mais rápido.</p>
+          <label class="switch">
+            <input type="checkbox" id="radio-ai" checked>
+            <span>IA ligada no rádio</span>
+          </label>
+        </div>
+        <div class="ai-card">
+          <h3>Cache</h3>
+          <p id="settings-cache">—</p>
+          <button class="btn" id="open-cache-folder">Abrir pasta</button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ===== FILA ===== -->
+  <aside class="queue">
+    <div class="section-head">
+      <span>Fila</span>
+      <button id="clear-queue" title="Limpar fila">×</button>
+    </div>
+    <div id="queue-list" class="queue-list"></div>
+  </aside>
+
+</div>
+
+<!-- ===== PLAYER ===== -->
+<footer class="player">
+  <div class="now-playing">
+    <div class="np-art-wrap">
+      <img id="np-art" src="" alt="" class="np-art hidden">
+    </div>
+    <div class="np-meta">
+      <div class="np-title" id="np-title">Sistema em espera</div>
+      <div class="np-artist" id="np-artist">// nenhuma faixa carregada</div>
+    </div>
+    <button class="icon-btn" id="np-fav" title="Favoritar">
+      <svg viewBox="0 0 24 24"><path d="M12 20s-7-4.5-7-9a4 4 0 0 1 7-2.6A4 4 0 0 1 19 11c0 4.5-7 9-7 9z"/></svg>
+    </button>
+  </div>
+
+  <div class="controls">
+    <div class="buttons">
+      <button class="icon-btn" id="btn-shuffle" title="Aleatório">
+        <svg viewBox="0 0 24 24"><path d="M16 4h4v4M4 20 20 4M16 20h4v-4M4 4l5 5"/></svg>
+      </button>
+      <button class="icon-btn" id="btn-prev" title="Anterior">
+        <svg viewBox="0 0 24 24"><path d="M19 5v14l-11-7z"/><path d="M6 5v14"/></svg>
+      </button>
+      <button class="icon-btn play" id="btn-play" title="Tocar">
+        <svg id="icon-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        <svg id="icon-pause" class="hidden" viewBox="0 0 24 24"><path d="M9 5v14M15 5v14"/></svg>
+      </button>
+      <button class="icon-btn" id="btn-next" title="Próxima">
+        <svg viewBox="0 0 24 24"><path d="M5 5v14l11-7z"/><path d="M18 5v14"/></svg>
+      </button>
+      <button class="icon-btn" id="btn-repeat" title="Repetir">
+        <svg viewBox="0 0 24 24"><path d="M17 2l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14M7 22l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+      </button>
+    </div>
+    <div class="progress">
+      <span id="time-current">0:00</span>
+      <div class="bar" id="progress-bar"><div class="bar-fill" id="progress-fill"></div></div>
+      <span id="time-total">0:00</span>
+    </div>
+  </div>
+
+  <div class="player-right">
+    <span class="badge hidden" id="radio-badge">rádio</span>
+    <span class="badge hidden" id="source-badge">offline</span>
+    <button class="icon-btn" id="btn-lyrics" title="Letra (L)">
+      <svg viewBox="0 0 24 24"><path d="M4 6h10M4 10h16M4 14h12M4 18h7"/></svg>
+    </button>
+    <button class="icon-btn" id="btn-radio" title="Iniciar rádio com esta música">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="2.5"/><path d="M7.5 16.5a6 6 0 0 1 0-9M16.5 7.5a6 6 0 0 1 0 9M4.5 19.5a10 10 0 0 1 0-15M19.5 4.5a10 10 0 0 1 0 15"/></svg>
+    </button>
+    <button class="icon-btn" id="btn-mute" title="Mudo">
+      <svg viewBox="0 0 24 24"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M16 9a4 4 0 0 1 0 6"/></svg>
+    </button>
+    <div class="bar volume" id="volume-bar"><div class="bar-fill" id="volume-fill"></div></div>
+  </div>
+</footer>
+
+<!-- ===== LETRAS ===== -->
+<section class="lyrics-panel" id="lyrics-panel">
+  <div class="lyrics-head">
+    <div>
+      <div class="lyrics-kicker">// Letra</div>
+      <div class="lyrics-title" id="lyrics-title">—</div>
+    </div>
+    <button class="icon-btn" id="lyrics-close" title="Fechar">
+      <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+  </div>
+  <div class="lyrics-body" id="lyrics-body"></div>
+</section>
+
+<audio id="audio"></audio>
+<div id="toast" class="toast"></div>
+<div id="modal-root"></div>
+
+<script>window.__errs=[];window.addEventListener("error",e=>window.__errs.push((e.message||"")+" @"+String(e.filename||"").split("/").pop()+":"+e.lineno));</script>
+<script src="mascot-lines.js"></script>
+<script src="mascot.js"></script>
+<script src="app.js"></script>
+<script src="extras.js"></script>
+</body>
+</html>

@@ -1,0 +1,39 @@
+[build]
+  publish = "."
+
+# O .exe precisa ser servido como download, nao aberto no navegador.
+[[headers]]
+  for = "/AptPlayer.exe"
+  [headers.values]
+    Content-Type = "application/octet-stream"
+    Content-Disposition = "attachment; filename=\"AptPlayer.exe\""
+    Cache-Control = "public, max-age=3600"
+
+[[headers]]
+  for = "/AptPlayer-Setup.exe"
+  [headers.values]
+    Content-Type = "application/octet-stream"
+    Content-Disposition = "attachment; filename=\"AptPlayer-Setup.exe\""
+    Cache-Control = "public, max-age=3600"
+
+[[headers]]
+  for = "/version.json"
+  [headers.values]
+    Content-Type = "application/json"
+    Cache-Control = "public, max-age=300"
+
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=604800"
+
+# Link curto e estavel para divulgar.
+[[redirects]]
+  from = "/download"
+  to = "/AptPlayer-Setup.exe"
+  status = 302
+
+[[redirects]]
+  from = "/portable"
+  to = "/AptPlayer.exe"
+  status = 302

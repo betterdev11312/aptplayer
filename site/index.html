@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AptPlayer — player de música com IA local</title>
+<meta name="description" content="Player de música que busca no YouTube, guarda sua biblioteca offline e conversa com uma IA rodando na sua máquina. Sem conta, sem API key, sem mensalidade.">
+<meta property="og:title" content="AptPlayer">
+<meta property="og:description" content="Player de música com IA local. Sem conta, sem API key, sem mensalidade.">
+<meta property="og:image" content="assets/icon.png">
+<meta property="og:type" content="website">
+<link rel="icon" href="assets/favicon.ico">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="scanlines"></div>
+<div class="grid-bg"></div>
+
+<!-- ===== NAV ===== -->
+<nav class="nav">
+  <a class="nav-brand" href="#top">
+    <img src="assets/icon.png" alt="">
+    <span>AptPlayer</span>
+  </a>
+  <div class="nav-links">
+    <a href="#recursos">Recursos</a>
+    <a href="#telas">Telas</a>
+    <a href="#ia">IA</a>
+    <a href="#changelog">Novidades</a>
+    <a class="nav-cta" href="AptPlayer.exe" download>Baixar</a>
+  </div>
+</nav>
+
+<!-- ===== HERO ===== -->
+<header class="hero" id="top">
+  <div class="hero-inner">
+    <div class="hero-text">
+      <div class="kicker">// v1.2 · Windows · instalador ou portátil</div>
+      <h1>Seu player.<br><span class="hl">Sua máquina.</span><br>Sem conta nenhuma.</h1>
+      <p class="lead">
+        Busca no YouTube, monta sua biblioteca, baixa o que você mais ouve e
+        conversa com uma IA que roda <strong>na sua máquina</strong>.
+        Sem login, sem API key, sem mensalidade.
+      </p>
+      <div class="hero-actions">
+        <a class="btn primary" href="AptPlayer.exe" download>
+          <svg viewBox="0 0 24 24"><path d="M12 3v12m0 0 4.5-4.5M12 15l-4.5-4.5M4 19h16"/></svg>
+          Baixar para Windows
+        </a>
+        <a class="btn ghost" href="#recursos">Ver o que faz</a>
+      </div>
+      <div class="hero-meta">
+        Arquivo único · não precisa instalar · funciona offline depois do cache
+      </div>
+    </div>
+
+    <div class="hero-art">
+      <img src="assets/icon.png" alt="Ícone do AptPlayer" class="hero-icon">
+      <div class="hero-ring"></div>
+    </div>
+  </div>
+</header>
+
+<!-- ===== RECURSOS ===== -->
+<section class="section" id="recursos">
+  <div class="section-head">
+    <div class="kicker">// Recursos</div>
+    <h2>O que ele faz</h2>
+  </div>
+
+  <div class="cards">
+    <article class="card">
+      <div class="card-icon">🎯</div>
+      <h3>Busca só música</h3>
+      <p>
+        Duas camadas de filtro: o YouTube Music confirma o que é música e uma
+        heurística derruba o resto. Buscar por vlog não traz vlog —
+        <em>"gameplay minecraft"</em> devolve zero resultados.
+      </p>
+    </article>
+
+    <article class="card">
+      <div class="card-icon">🏠</div>
+      <h3>Tela inicial</h3>
+      <p>
+        Abre numa home de descoberta, não numa busca vazia: categorias por
+        gênero, clima e década, além de <em>"porque você ouviu X"</em> montado
+        a partir do seu histórico.
+      </p>
+    </article>
+
+    <article class="card">
+      <div class="card-icon">📻</div>
+      <h3>Rádio infinito</h3>
+      <p>
+        Toque algo e ligue o rádio: ele monta uma fila de músicas parecidas
+        combinando o mix do YouTube com a IA analisando gênero e clima.
+        Quando a fila esvazia, ele busca mais sozinho.
+      </p>
+    </article>
+
+    <article class="card">
+      <div class="card-icon">💾</div>
+      <h3>Cache automático</h3>
+      <p>
+        Toca por streaming na hora e baixa sozinho o que você repete. Dá para
+        forçar o download de uma faixa — ou de uma playlist inteira — com um
+        clique, sem esperar as 3 reproduções.
+      </p>
+    </article>
+
+    <article class="card">
+      <div class="card-icon">🐱</div>
+      <h3>Byte, o mascote</h3>
+      <p>
+        Um gato cyberpunk em pixel art mora no seu player. Ele anda, dança com
+        a música, comenta o que você faz e responde quando você clica nele —
+        ou foge, se não entender a pergunta.
+      </p>
+    </article>
+
+    <article class="card">
+      <div class="card-icon">🎤</div>
+      <h3>Letras sincronizadas</h3>
+      <p>
+        A letra acompanha a música linha a linha. Clique em qualquer verso
+        para pular até ele.
+      </p>
+    </article>
+
+    <article class="card">
+      <div class="card-icon">🎨</div>
+      <h3>Seis temas</h3>
+      <p>
+        Doze temas: de Edgerunners e Synthwave a Arcade (fonte de fliperama)
+        e Snow (claro). Cada um muda cor, brilho, scanlines, cantos e fonte.
+      </p>
+    </article>
+
+    <article class="card">
+      <div class="card-icon">📁</div>
+      <h3>Playlists com capa</h3>
+      <p>
+        Crie, renomeie e dê a capa que quiser a cada playlist. Favoritas,
+        histórico e mais tocadas ficam guardados num banco local.
+      </p>
+    </article>
+
+    <article class="card">
+      <div class="card-icon">🔒</div>
+      <h3>Nada sai da sua máquina</h3>
+      <p>
+        Biblioteca, cache, capas e conversas com a IA ficam só no seu PC.
+        Não existe servidor do AptPlayer — porque não existe AptPlayer online.
+      </p>
+    </article>
+  </div>
+</section>
+
+<!-- ===== TELAS ===== -->
+<section class="section" id="telas">
+  <div class="section-head">
+    <div class="kicker">// Telas</div>
+    <h2>Como ele é</h2>
+  </div>
+
+  <div class="shots">
+    <figure class="shot">
+      <img src="assets/shot-home.png" alt="Tela inicial do AptPlayer" loading="lazy">
+      <figcaption>Início — descoberta por categoria e sugestões do seu histórico</figcaption>
+    </figure>
+    <figure class="shot">
+      <img src="assets/shot-search.png" alt="Tela de busca do AptPlayer" loading="lazy">
+      <figcaption>Busca filtrada — tema Edgerunners</figcaption>
+    </figure>
+    <figure class="shot">
+      <img src="assets/shot-chat.png" alt="Chat com a IA" loading="lazy">
+      <figcaption>Chat com a IA — tema Synthwave</figcaption>
+    </figure>
+    <figure class="shot">
+      <img src="assets/shot-themes.png" alt="Seletor de temas" loading="lazy">
+      <figcaption>Os seis temas — tema Matrix</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- ===== IA ===== -->
+<section class="section" id="ia">
+  <div class="section-head">
+    <div class="kicker">// Inteligência artificial</div>
+    <h2>A IA roda no seu PC</h2>
+  </div>
+
+  <div class="split">
+    <div class="split-text">
+      <p>
+        O AptPlayer usa o <a href="https://ollama.com" target="_blank" rel="noopener">Ollama</a>,
+        que roda modelos de linguagem localmente. Nenhuma mensagem sai da sua
+        máquina e não existe chave de API para configurar.
+      </p>
+      <ul class="feature-list">
+        <li><strong>Chat</strong> — converse sobre música; as faixas que ela sugere viram botões que tocam na hora</li>
+        <li><strong>Busca inteligente</strong> — <em>"algo tipo Pink Floyd mas mais pesado"</em></li>
+        <li><strong>Playlists</strong> — descreva um clima e ela monta da sua biblioteca</li>
+        <li><strong>Organização</strong> — classifica gênero e clima das faixas sozinha</li>
+      </ul>
+      <p class="note">
+        A IA é <strong>opcional</strong>. Sem o Ollama o player funciona normalmente —
+        só as abas de IA ficam desativadas.
+      </p>
+    </div>
+
+    <div class="split-box">
+      <div class="box-title">Para ativar a IA</div>
+      <ol class="steps">
+        <li>Instale o <a href="https://ollama.com" target="_blank" rel="noopener">Ollama</a></li>
+        <li>Abra o terminal e rode:</li>
+      </ol>
+      <div class="code">
+        <code>ollama pull llama3.2</code>
+        <button class="copy" data-copy="ollama pull llama3.2" title="Copiar">copiar</button>
+      </div>
+      <p class="box-note">
+        São ~2 GB. Depois disso o AptPlayer detecta o modelo sozinho.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== DOWNLOAD ===== -->
+<section class="section download" id="download">
+  <div class="dl-box">
+    <div class="kicker">// Download</div>
+    <h2>Pegue o seu</h2>
+    <p>Arquivo único. Baixou, clicou, funciona.</p>
+    <div class="dl-options">
+      <a class="btn primary big" href="AptPlayer-Setup.exe" download>
+        <svg viewBox="0 0 24 24"><path d="M12 3v12m0 0 4.5-4.5M12 15l-4.5-4.5M4 19h16"/></svg>
+        Instalador — 44 MB
+      </a>
+      <a class="btn ghost big" href="AptPlayer.exe" download>
+        Portátil — 25 MB
+      </a>
+    </div>
+    <div class="dl-meta">
+      <strong>Instalador</strong>: cria atalhos e aparece em Aplicativos Instalados.<br>
+      <strong>Portátil</strong>: arquivo único, roda de onde estiver.<br><br>
+      Windows 10/11 · 64-bit<br>
+      <span class="dim">
+        O Windows pode avisar que o app é desconhecido — é normal em programas
+        sem assinatura digital paga. Clique em <em>Mais informações → Executar assim mesmo</em>.
+      </span>
+    </div>
+  </div>
+</section>
+
+<!-- ===== CHANGELOG ===== -->
+<section class="section" id="changelog">
+  <div class="section-head">
+    <div class="kicker">// Novidades</div>
+    <h2>Registro de atualizações</h2>
+  </div>
+
+  <div class="timeline">
+
+    <article class="entry">
+      <div class="entry-mark"></div>
+      <div class="entry-body">
+        <div class="entry-head">
+          <span class="version">v1.2</span>
+          <span class="date">17 set 2026</span>
+          <span class="badge-new">atual</span>
+        </div>
+        <h3>Byte, o mascote — e muito mais</h3>
+        <ul>
+          <li><strong>Mascote</strong> — o Byte é um gato cyberpunk em pixel art que anda pela tela, dança com a música e comenta o que você faz. Mais de 200 falas. Clique nele para conversar; se não entender a pergunta, ele foge.</li>
+          <li><strong>12 temas</strong> — seis novos: Arasaka, Acid, Midnight, Amber, Arcade (fonte de fliperama) e Snow (o único claro).</li>
+          <li><strong>Tipografia nova</strong> — Orbitron nos títulos, Chakra Petch no corpo, JetBrains Mono nos detalhes.</li>
+          <li><strong>Letras sincronizadas</strong> — a linha atual acompanha a música. Clique numa linha para pular até ela. Tecla <em>L</em>.</li>
+          <li><strong>Fila arrastável</strong> — reordene arrastando, remova com um clique.</li>
+          <li><strong>Teclas de mídia</strong> — play, pausa e faixa anterior/próxima do teclado. Setas ↑↓ controlam o volume.</li>
+          <li><strong>Instalador</strong> — com atalhos e desinstalação registrada. O portátil continua disponível.</li>
+          <li>Correção: o instalador congelava durante a cópia — agora o trabalho roda em segundo plano e há barra de progresso.</li>
+          <li><strong>Diagnóstico</strong> — em Ajustes, veja versão, conexão e estado da IA, e procure atualizações.</li>
+          <li>Correção importante: o layout crescia sem limite e quebrava a rolagem das telas.</li>
+        </ul>
+      </div>
+    </article>
+
+    <article class="entry">
+      <div class="entry-mark"></div>
+      <div class="entry-body">
+        <div class="entry-head">
+          <span class="version">v1.1</span>
+          <span class="date">17 set 2026</span>
+        </div>
+        <h3>Tela inicial e download sob demanda</h3>
+        <ul>
+          <li><strong>Início</strong> — home de descoberta com carrosséis, 22 categorias (gênero, clima e década) e seções montadas do seu histórico, como <em>"porque você ouviu X"</em>.</li>
+          <li><strong>Download manual</strong> — botão em cada faixa para baixar na hora, sem esperar as 3 reproduções. O ícone mostra o que já está offline.</li>
+          <li><strong>Baixar playlist inteira</strong> — um clique põe todas as faixas na fila de download.</li>
+          <li>A home carrega em ~4s: as seções são buscadas em paralelo e ficam em cache por 6 horas.</li>
+          <li>Correção: categorias traziam coletâneas de 2 horas em vez de faixas individuais.</li>
+        </ul>
+      </div>
+    </article>
+
+    <article class="entry">
+      <div class="entry-mark"></div>
+      <div class="entry-body">
+        <div class="entry-head">
+          <span class="version">v1.0</span>
+          <span class="date">17 set 2026</span>
+        </div>
+        <h3>Rádio infinito e temas</h3>
+        <ul>
+          <li><strong>Rádio</strong> — fila infinita de músicas parecidas, combinando o mix do YouTube com a IA. Não repete faixa na mesma sessão.</li>
+          <li><strong>Seis temas</strong> — Edgerunners, Synthwave, Matrix, Vaporwave, Blood e Clean, com efeitos próprios.</li>
+          <li><strong>Chat com a IA</strong> — conversa livre; as sugestões viram botões que tocam na hora.</li>
+          <li><strong>Playlists com capa</strong> — nome e imagem personalizados.</li>
+          <li><strong>Busca só de música</strong> — filtro em duas camadas contra vlog e gameplay.</li>
+          <li><strong>Cache híbrido</strong> — o que você mais ouve vira arquivo local automaticamente.</li>
+          <li>Correção: títulos invertidos (<em>"Numb — Linkin Park"</em>) e sufixos como <em>[4K UPGRADE]</em>.</li>
+        </ul>
+      </div>
+    </article>
+
+  </div>
+
+  <p class="soon">// próximas versões aparecem aqui</p>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <img src="assets/icon.png" alt="">
+      <div>
+        <div class="footer-name">AptPlayer</div>
+        <div class="footer-tag">player de música com IA local</div>
+      </div>
+    </div>
+    <p class="footer-note">
+      Projeto pessoal, sem fins comerciais. O AptPlayer não hospeda nem
+      distribui música — ele apenas reproduz conteúdo público do YouTube na
+      sua própria máquina, para uso pessoal.
+    </p>
+  </div>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>

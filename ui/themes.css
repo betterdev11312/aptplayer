@@ -1,0 +1,357 @@
+/* ============================================================
+   Temas do AptPlayer
+   Cada tema redefine as variaveis e liga/desliga efeitos.
+   Trocar: document.documentElement.dataset.theme = "matrix"
+   ============================================================ */
+
+/* ---------- 1. EDGERUNNERS (padrao) ---------- */
+:root,
+[data-theme="edgerunners"] {
+  --bg:#05060a; --bg-deep:#030407; --panel:#0a0d16; --panel-2:#0e1220;
+  --elev:#131828; --hover:#1a2137;
+  --yellow:#fcee0a; --cyan:#00f0ff; --magenta:#ff2a6d; --violet:#9d4edd;
+  --text:#e8ecf8; --text-dim:#7c89a8; --text-faint:#4a5675;
+  --line:rgba(0,240,255,.14); --line-hot:rgba(252,238,10,.45);
+  --glow-y:0 0 12px rgba(252,238,10,.55);
+  --glow-c:0 0 12px rgba(0,240,255,.55);
+  --glow-m:0 0 12px rgba(255,42,109,.55);
+  --font:"Chakra Petch","Segoe UI",system-ui,sans-serif;
+  --display:"Orbitron","Chakra Petch",sans-serif;
+  --mono:"JetBrains Mono","Consolas",monospace;
+  --scanline:.22; --glitch:1; --radius:0px; --cut:1;
+  --grid-color:rgba(0,240,255,.05);
+  --halo-1:rgba(0,240,255,.10); --halo-2:rgba(255,42,109,.08); --halo-3:rgba(252,238,10,.05);
+}
+
+/* ---------- 2. SYNTHWAVE ---------- */
+[data-theme="synthwave"] {
+  --bg:#0d0221; --bg-deep:#06010f; --panel:#170a2e; --panel-2:#1d0e38;
+  --elev:#26134a; --hover:#331a5e;
+  --yellow:#ff6ac1; --cyan:#00e5ff; --magenta:#f9c80e; --violet:#c77dff;
+  --text:#f2e9ff; --text-dim:#a48bc8; --text-faint:#6f5a92;
+  --line:rgba(255,106,193,.20); --line-hot:rgba(255,106,193,.55);
+  --glow-y:0 0 16px rgba(255,106,193,.65);
+  --glow-c:0 0 16px rgba(0,229,255,.6);
+  --glow-m:0 0 16px rgba(249,200,14,.55);
+  --font:"Chakra Petch","Segoe UI",system-ui,sans-serif;
+  --display:"Orbitron","Chakra Petch",sans-serif;
+  --mono:"Share Tech Mono","Consolas",monospace;
+  --scanline:.14; --glitch:1; --radius:0px; --cut:1;
+  --grid-color:rgba(255,106,193,.07);
+  --halo-1:rgba(255,106,193,.16); --halo-2:rgba(0,229,255,.12); --halo-3:rgba(199,125,255,.10);
+}
+
+/* ---------- 3. MATRIX ---------- */
+[data-theme="matrix"] {
+  --bg:#000700; --bg-deep:#000300; --panel:#021203; --panel-2:#031a05;
+  --elev:#052507; --hover:#07360a;
+  --yellow:#00ff41; --cyan:#00c853; --magenta:#76ff03; --violet:#00e676;
+  --text:#c8ffd4; --text-dim:#4caf68; --text-faint:#2e7d42;
+  --line:rgba(0,255,65,.18); --line-hot:rgba(0,255,65,.5);
+  --glow-y:0 0 12px rgba(0,255,65,.7);
+  --glow-c:0 0 12px rgba(0,200,83,.6);
+  --glow-m:0 0 12px rgba(118,255,3,.5);
+  --font:"Share Tech Mono","Consolas",monospace;
+  --display:"VT323","Share Tech Mono",monospace;
+  --mono:"Share Tech Mono","Consolas",monospace;
+  --scanline:.3; --glitch:1; --radius:0px; --cut:0;
+  --grid-color:rgba(0,255,65,.06);
+  --halo-1:rgba(0,255,65,.10); --halo-2:rgba(0,200,83,.07); --halo-3:rgba(0,255,65,.04);
+}
+
+/* ---------- 4. VAPORWAVE ---------- */
+[data-theme="vaporwave"] {
+  --bg:#1a1033; --bg-deep:#120b24; --panel:#241847; --panel-2:#2d1f57;
+  --elev:#392a68; --hover:#48377d;
+  --yellow:#ff99e6; --cyan:#7af0ff; --magenta:#ffd6a5; --violet:#c9b6ff;
+  --text:#fdf2ff; --text-dim:#c3aee0; --text-faint:#8e7bb0;
+  --line:rgba(122,240,255,.22); --line-hot:rgba(255,153,230,.5);
+  --glow-y:0 0 18px rgba(255,153,230,.5);
+  --glow-c:0 0 18px rgba(122,240,255,.5);
+  --glow-m:0 0 18px rgba(255,214,165,.45);
+  --font:"Rajdhani","Segoe UI",system-ui,sans-serif;
+  --display:"Orbitron","Rajdhani",sans-serif;
+  --mono:"Share Tech Mono","Consolas",monospace;
+  --scanline:0; --glitch:0; --radius:10px; --cut:0;
+  --grid-color:rgba(122,240,255,.05);
+  --halo-1:rgba(255,153,230,.16); --halo-2:rgba(122,240,255,.14); --halo-3:rgba(201,182,255,.10);
+}
+
+/* ---------- 5. BLOOD ---------- */
+[data-theme="blood"] {
+  --bg:#0a0203; --bg-deep:#050101; --panel:#160406; --panel-2:#1f0609;
+  --elev:#2b090d; --hover:#3d0e13;
+  --yellow:#ff1e27; --cyan:#ff6b35; --magenta:#c1121f; --violet:#8d0801;
+  --text:#ffe8e8; --text-dim:#b07a7a; --text-faint:#7a4a4a;
+  --line:rgba(255,30,39,.20); --line-hot:rgba(255,30,39,.55);
+  --glow-y:0 0 14px rgba(255,30,39,.7);
+  --glow-c:0 0 14px rgba(255,107,53,.55);
+  --glow-m:0 0 14px rgba(193,18,31,.6);
+  --font:"Chakra Petch","Segoe UI",system-ui,sans-serif;
+  --display:"Orbitron","Chakra Petch",sans-serif;
+  --mono:"JetBrains Mono","Consolas",monospace;
+  --scanline:.26; --glitch:1; --radius:0px; --cut:1;
+  --grid-color:rgba(255,30,39,.05);
+  --halo-1:rgba(255,30,39,.12); --halo-2:rgba(139,0,0,.12); --halo-3:rgba(255,107,53,.06);
+}
+
+/* ---------- 6. CLEAN ---------- */
+[data-theme="clean"] {
+  --bg:#131316; --bg-deep:#0e0e10; --panel:#1a1a1f; --panel-2:#1f1f25;
+  --elev:#26262e; --hover:#31313b;
+  --yellow:#e8e8ec; --cyan:#8ab4f8; --magenta:#f28b82; --violet:#a8a8b3;
+  --text:#f0f0f4; --text-dim:#9e9eaa; --text-faint:#6b6b78;
+  --line:rgba(255,255,255,.10); --line-hot:rgba(255,255,255,.26);
+  --glow-y:none; --glow-c:none; --glow-m:none;
+  --font:"Chakra Petch","Segoe UI",system-ui,sans-serif;
+  --display:"Chakra Petch","Segoe UI",sans-serif;
+  --mono:"JetBrains Mono","Consolas",monospace;
+  --scanline:0; --glitch:0; --radius:8px; --cut:0;
+  --grid-color:transparent;
+  --halo-1:transparent; --halo-2:transparent; --halo-3:transparent;
+}
+
+/* ---------- 7. ARASAKA ---------- */
+[data-theme="arasaka"] {
+  --bg:#0a0a0c; --bg-deep:#050506; --panel:#121215; --panel-2:#17171c;
+  --elev:#1f1f26; --hover:#2a2a33;
+  --yellow:#e8e8ec; --cyan:#ff3b3b; --magenta:#ff6b6b; --violet:#8a8a95;
+  --text:#f4f4f6; --text-dim:#9a9aa6; --text-faint:#63636f;
+  --line:rgba(255,59,59,.16); --line-hot:rgba(255,255,255,.4);
+  --glow-y:0 0 12px rgba(255,255,255,.35);
+  --glow-c:0 0 14px rgba(255,59,59,.6);
+  --glow-m:0 0 14px rgba(255,107,107,.5);
+  --font:"Chakra Petch","Segoe UI",system-ui,sans-serif;
+  --display:"Orbitron","Chakra Petch",sans-serif;
+  --mono:"JetBrains Mono","Consolas",monospace;
+  --scanline:.2; --glitch:1; --radius:0px; --cut:1;
+  --grid-color:rgba(255,59,59,.04);
+  --halo-1:rgba(255,59,59,.10); --halo-2:rgba(255,255,255,.04); --halo-3:rgba(255,59,59,.05);
+}
+
+/* ---------- 8. ACID ---------- */
+[data-theme="acid"] {
+  --bg:#07100a; --bg-deep:#040a06; --panel:#0c1a11; --panel-2:#102316;
+  --elev:#163020; --hover:#1e402b;
+  --yellow:#c6ff2e; --cyan:#39ffa0; --magenta:#ff9f1c; --violet:#7bed9f;
+  --text:#eaffe4; --text-dim:#84b78f; --text-faint:#557a5e;
+  --line:rgba(57,255,160,.18); --line-hot:rgba(198,255,46,.5);
+  --glow-y:0 0 14px rgba(198,255,46,.6);
+  --glow-c:0 0 14px rgba(57,255,160,.55);
+  --glow-m:0 0 14px rgba(255,159,28,.5);
+  --font:"Chakra Petch","Segoe UI",system-ui,sans-serif;
+  --display:"Orbitron","Chakra Petch",sans-serif;
+  --mono:"JetBrains Mono","Consolas",monospace;
+  --scanline:.16; --glitch:1; --radius:0px; --cut:1;
+  --grid-color:rgba(57,255,160,.05);
+  --halo-1:rgba(198,255,46,.10); --halo-2:rgba(57,255,160,.09); --halo-3:rgba(255,159,28,.05);
+}
+
+/* ---------- 9. MIDNIGHT ---------- */
+[data-theme="midnight"] {
+  --bg:#080c18; --bg-deep:#050810; --panel:#0e1426; --panel-2:#121a31;
+  --elev:#1a2442; --hover:#243055;
+  --yellow:#8ab4ff; --cyan:#6c7ce8; --magenta:#b48ce8; --violet:#5a6bd8;
+  --text:#e4eaff; --text-dim:#8f9bc4; --text-faint:#5c688c;
+  --line:rgba(138,180,255,.15); --line-hot:rgba(138,180,255,.42);
+  --glow-y:0 0 14px rgba(138,180,255,.45);
+  --glow-c:0 0 14px rgba(108,124,232,.45);
+  --glow-m:0 0 14px rgba(180,140,232,.4);
+  --font:"Chakra Petch","Segoe UI",system-ui,sans-serif;
+  --display:"Orbitron","Chakra Petch",sans-serif;
+  --mono:"JetBrains Mono","Consolas",monospace;
+  --scanline:.08; --glitch:0; --radius:6px; --cut:0;
+  --grid-color:rgba(138,180,255,.04);
+  --halo-1:rgba(138,180,255,.10); --halo-2:rgba(108,124,232,.08); --halo-3:rgba(180,140,232,.06);
+}
+
+/* ---------- 10. AMBER ---------- */
+[data-theme="amber"] {
+  --bg:#120c04; --bg-deep:#0b0702; --panel:#1c1306; --panel-2:#241908;
+  --elev:#30220c; --hover:#402e12;
+  --yellow:#ffb000; --cyan:#ff8c1a; --magenta:#ffd166; --violet:#cc8400;
+  --text:#ffe9c4; --text-dim:#b89355; --text-faint:#806536;
+  --line:rgba(255,176,0,.18); --line-hot:rgba(255,176,0,.5);
+  --glow-y:0 0 14px rgba(255,176,0,.6);
+  --glow-c:0 0 14px rgba(255,140,26,.5);
+  --glow-m:0 0 12px rgba(255,209,102,.45);
+  --font:"Share Tech Mono","Consolas",monospace;
+  --display:"VT323","Share Tech Mono",monospace;
+  --mono:"Share Tech Mono","Consolas",monospace;
+  --scanline:.34; --glitch:1; --radius:0px; --cut:0;
+  --grid-color:rgba(255,176,0,.05);
+  --halo-1:rgba(255,176,0,.10); --halo-2:rgba(255,140,26,.07); --halo-3:rgba(255,176,0,.04);
+}
+
+/* ---------- 11. ARCADE ---------- */
+[data-theme="arcade"] {
+  --bg:#12071c; --bg-deep:#0a0412; --panel:#1d0e2c; --panel-2:#251338;
+  --elev:#331b4c; --hover:#452566;
+  --yellow:#ffe14d; --cyan:#4deeff; --magenta:#ff4d88; --violet:#a64dff;
+  --text:#fff6e0; --text-dim:#b49ccc; --text-faint:#7a6690;
+  --line:rgba(77,238,255,.2); --line-hot:rgba(255,225,77,.5);
+  --glow-y:0 0 16px rgba(255,225,77,.65);
+  --glow-c:0 0 16px rgba(77,238,255,.6);
+  --glow-m:0 0 16px rgba(255,77,136,.55);
+  --font:"Press Start 2P","Chakra Petch",monospace;
+  --display:"Press Start 2P","Chakra Petch",monospace;
+  --mono:"Press Start 2P","Consolas",monospace;
+  --scanline:.28; --glitch:1; --radius:0px; --cut:0;
+  --grid-color:rgba(77,238,255,.06);
+  --halo-1:rgba(255,77,136,.12); --halo-2:rgba(77,238,255,.12); --halo-3:rgba(255,225,77,.08);
+}
+
+/* ---------- 12. SNOW (claro) ---------- */
+[data-theme="snow"] {
+  --bg:#e8ebf2; --bg-deep:#dde1ea; --panel:#f4f6fa; --panel-2:#ffffff;
+  --elev:#eaedf4; --hover:#dde2ee;
+  --yellow:#0066cc; --cyan:#0a8fa8; --magenta:#d6336c; --violet:#6741d9;
+  --text:#14181f; --text-dim:#525a6b; --text-faint:#8b93a3;
+  --line:rgba(20,24,31,.14); --line-hot:rgba(0,102,204,.45);
+  --glow-y:0 0 10px rgba(0,102,204,.25);
+  --glow-c:0 0 10px rgba(10,143,168,.25);
+  --glow-m:0 0 10px rgba(214,51,108,.25);
+  --font:"Chakra Petch","Segoe UI",system-ui,sans-serif;
+  --display:"Orbitron","Chakra Petch",sans-serif;
+  --mono:"JetBrains Mono","Consolas",monospace;
+  --scanline:0; --glitch:0; --radius:8px; --cut:0;
+  --grid-color:rgba(20,24,31,.03);
+  --halo-1:rgba(0,102,204,.07); --halo-2:rgba(214,51,108,.05); --halo-3:rgba(103,65,217,.05);
+}
+
+/* ===== efeitos controlados por tema ===== */
+
+/* scanlines: opacidade 0 desliga */
+body::after { opacity: var(--scanline); }
+body:not(.fx-flicker)::after { animation: none; }
+
+/* glitch do logo: so quando --glitch = 1 */
+[data-theme="vaporwave"] .brand-name::before,
+[data-theme="vaporwave"] .brand-name::after,
+[data-theme="clean"] .brand-name::before,
+[data-theme="clean"] .brand-name::after,
+[data-theme="midnight"] .brand-name::before,
+[data-theme="midnight"] .brand-name::after,
+[data-theme="snow"] .brand-name::before,
+[data-theme="snow"] .brand-name::after { display: none; }
+
+/* cortes chanfrados: temas com --cut 0 usam cantos normais/arredondados */
+[data-theme="vaporwave"] .btn,
+[data-theme="clean"] .btn,
+[data-theme="matrix"] .btn,
+[data-theme="midnight"] .btn,
+[data-theme="amber"] .btn,
+[data-theme="arcade"] .btn,
+[data-theme="snow"] .btn { clip-path: none; border-radius: var(--radius); }
+
+[data-theme="vaporwave"] .searchbar,
+[data-theme="clean"] .searchbar,
+[data-theme="matrix"] .searchbar,
+[data-theme="midnight"] .searchbar,
+[data-theme="amber"] .searchbar,
+[data-theme="arcade"] .searchbar,
+[data-theme="snow"] .searchbar { clip-path: none; border-radius: var(--radius); }
+
+[data-theme="vaporwave"] .ai-card,
+[data-theme="clean"] .ai-card,
+[data-theme="matrix"] .ai-card,
+[data-theme="midnight"] .ai-card,
+[data-theme="amber"] .ai-card,
+[data-theme="arcade"] .ai-card,
+[data-theme="snow"] .ai-card { clip-path: none; border-radius: var(--radius); }
+
+[data-theme="vaporwave"] .icon-btn.play,
+[data-theme="clean"] .icon-btn.play,
+[data-theme="matrix"] .icon-btn.play,
+[data-theme="midnight"] .icon-btn.play,
+[data-theme="amber"] .icon-btn.play,
+[data-theme="arcade"] .icon-btn.play,
+[data-theme="snow"] .icon-btn.play { clip-path: none; border-radius: 50%; }
+
+[data-theme="vaporwave"] .modal,
+[data-theme="clean"] .modal,
+[data-theme="matrix"] .modal,
+[data-theme="midnight"] .modal,
+[data-theme="amber"] .modal,
+[data-theme="arcade"] .modal,
+[data-theme="snow"] .modal { clip-path: none; border-radius: var(--radius); }
+
+[data-theme="vaporwave"] .toast,
+[data-theme="clean"] .toast,
+[data-theme="matrix"] .toast,
+[data-theme="midnight"] .toast,
+[data-theme="amber"] .toast,
+[data-theme="arcade"] .toast,
+[data-theme="snow"] .toast { clip-path: none; border-radius: var(--radius); }
+
+/* imagens arredondadas nos temas suaves */
+[data-theme="vaporwave"] .track-art img,
+[data-theme="clean"] .track-art img,
+[data-theme="vaporwave"] .q-item img,
+[data-theme="clean"] .q-item img,
+[data-theme="vaporwave"] .np-art,
+[data-theme="clean"] .np-art { border-radius: var(--radius); }
+
+/* clean: sem brilho nenhum */
+[data-theme="clean"] .brand-icon { filter: none; }
+[data-theme="clean"] .nav-item.active { text-shadow: none; }
+[data-theme="clean"] .track.playing .track-title { text-shadow: none; }
+[data-theme="clean"] .view-head::after { box-shadow: none; }
+
+/* ===== seletor de tema ===== */
+.theme-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 13px;
+}
+.theme-card {
+  border: 1px solid var(--line); background: var(--panel-2);
+  padding: 14px; cursor: pointer; transition: all .18s;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.theme-card:hover { border-color: var(--line-hot); transform: translateY(-2px); }
+.theme-card.active { border-color: var(--line-hot); box-shadow: var(--glow-y); }
+.theme-name {
+  font-size: 12.5px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 1.2px;
+}
+.theme-desc { font-size: 11px; color: var(--text-dim); line-height: 1.45; }
+.theme-swatches { display: flex; gap: 5px; }
+.theme-swatches i {
+  width: 22px; height: 22px; display: block;
+  border: 1px solid rgba(255,255,255,.12);
+}
+
+
+/* Press Start 2P e muito larga: o tema Arcade precisa de tamanhos menores */
+[data-theme="arcade"] { font-size: 12px; }
+[data-theme="arcade"] .view-head h1 { font-size: 20px; letter-spacing: 0; }
+[data-theme="arcade"] .nav-item { font-size: 9.5px; letter-spacing: 0; }
+[data-theme="arcade"] .track-title { font-size: 11px; }
+[data-theme="arcade"] .track-artist,
+[data-theme="arcade"] .tile-artist { font-size: 8.5px; }
+[data-theme="arcade"] .tile-title { font-size: 9.5px; }
+[data-theme="arcade"] .btn { font-size: 9px; padding: 11px 16px; }
+[data-theme="arcade"] .chip { font-size: 8.5px; }
+[data-theme="arcade"] .row-title { font-size: 13px; }
+[data-theme="arcade"] .brand-name { font-size: 12px; }
+[data-theme="arcade"] .cat-bubble,
+[data-theme="arcade"] .msg-body { font-size: 10px; line-height: 1.7; }
+
+/* Snow e o unico tema claro: sombras e contraste precisam de ajuste */
+[data-theme="snow"] .cat-sprite { filter: drop-shadow(0 4px 10px rgba(0,0,0,.28)); }
+[data-theme="snow"] .track-art img { box-shadow: 0 2px 8px rgba(20,24,31,.12); }
+[data-theme="snow"] .icon-btn.play svg { fill: #fff; stroke: #fff; }
+[data-theme="snow"] .np-art { box-shadow: 0 2px 10px rgba(20,24,31,.18); }
+
+/* Fonte de display nos titulos (todos os temas) */
+.view-head h1,
+.brand-name,
+.row-title,
+.pl-header-info h1,
+.section-head h2 { font-family: var(--display, var(--font)); }
+
+
+/* Cada card de tema e pintado com as cores DAQUELE tema (via style inline),
+   entao o texto precisa herdar a cor do proprio card, nunca a do tema atual. */
+.theme-card .theme-name { color: inherit; }
+.theme-card .theme-desc { opacity: .75; color: inherit; }
