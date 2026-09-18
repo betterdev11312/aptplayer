@@ -1,5 +1,6 @@
 {
-  "version": "1.4.0",
-  "url": "https://github.com/betterdev11312/aptplayer/releases/download/v1.4.0/AptPlayer-Setup.exe",
-  "notes": "Transicao entre musicas, timer para dormir, compartilhar playlists, traducao de letras em 89 idiomas e interface em 8 idiomas."
+  "version": "1.5.0",
+  "url": "https://github.com/betterdev11312/aptplayer/releases/download/v1.5.0/AptPlayer-Setup.exe",
+  "exe": "https://github.com/betterdev11312/aptplayer/releases/download/v1.5.0/AptPlayer.exe",
+  "notes": "Atualizacao automatica: o app baixa e instala sozinho, sem passar pelo navegador."
 }

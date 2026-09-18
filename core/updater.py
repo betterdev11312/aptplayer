@@ -12,7 +12,7 @@ import requests
 
 from .paths import DATA_DIR
 
-VERSION = "1.4.0"
+VERSION = "1.5.0"
 
 # Site do projeto (Cloudflare Workers). Deixe vazio para desligar a verificacao.
 SITE_URL = "https://betterdev11312.github.io/aptplayer"
@@ -66,6 +66,7 @@ def check() -> dict:
         "update": False,
         "notes": "",
         "url": "",
+        "exe": "",
         "reason": "",
     }
 
@@ -102,6 +103,8 @@ def check() -> dict:
     result["latest"] = latest
     result["notes"] = str(data.get("notes", ""))
     result["url"] = str(data.get("url", ""))
+    # link do .exe puro: e o que a atualizacao automatica substitui
+    result["exe"] = str(data.get("exe", ""))
     result["update"] = is_newer(latest)
     return result
 

@@ -6,9 +6,9 @@ window.pywebview.api.<nome>(...).
 
 from pathlib import Path
 
-from . import (account, ai, cache, discover, hotkeys, library, lyrics,
-               radio, share, spotify, stats, translate, updater,
-               youtube)
+from . import (account, ai, autoupdate, cache, discover, hotkeys, library,
+               lyrics,
+               radio, share, spotify, stats, translate, updater, youtube)
 from .paths import COVERS_DIR
 
 
@@ -713,3 +713,15 @@ class Api:
 
         return {"ok": True, "synced": False, "plain": result["text"],
                 "engine": result.get("engine", "")}
+
+    # --- atualizacao automatica -------------------------------------------
+
+    def can_auto_update(self) -> dict:
+        return {"ok": True, "supported": autoupdate.can_auto_update()}
+
+    def start_auto_update(self, url: str, version: str) -> dict:
+        """Baixa e instala a versao nova, reiniciando o app no fim."""
+        return autoupdate.start(url, version)
+
+    def auto_update_progress(self) -> dict:
+        return {"ok": True, **autoupdate.state()}

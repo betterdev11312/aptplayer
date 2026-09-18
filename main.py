@@ -138,6 +138,14 @@ def _set_taskbar_identity():
 def main():
     _set_taskbar_identity()
     ensure_dirs()
+
+    # remove o executavel antigo deixado por uma atualizacao anterior
+    try:
+        from core import autoupdate
+        autoupdate.cleanup_old()
+    except Exception:
+        pass
+
     library.init_db()
     port = start_media_server()
 

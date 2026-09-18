@@ -1333,15 +1333,93 @@ $("check-update")?.addEventListener("click", async () => {
   }
   if (!res.update) return toast(`você já está na versão mais recente (${res.current})`);
 
-  modal({
-    title: `Versão ${res.latest} disponível`,
-    fields: [],
-    confirmText: "Baixar",
-    onConfirm: () => {
-      if (res.url) window.open(res.url, "_blank");
-    },
-  });
+  showUpdateDialog(res);
 });
+
+/** Diálogo de atualização: baixa e instala sozinho quando possível. */
+async function showUpdateDialog(info) {
+  const auto = await api().can_auto_update();
+  const root = $("modal-root");
+  const bg = document.createElement("div");
+  bg.className = "modal-bg";
+
+  const notes = info.notes
+    ? `<div class="update-notes">${esc(info.notes)}</div>` : "";
+
+  bg.innerHTML =
+    `<div class="modal" style="width:440px">` +
+      `<h3>Versão ${esc(info.latest)} disponível</h3>` +
+      `<div class="update-sub">Você tem a ${esc(info.current)}</div>` +
+      notes +
+      `<div class="update-bar hidden" id="upd-bar">` +
+        `<div class="update-fill" id="upd-fill"></div>` +
+      `</div>` +
+      `<div class="update-step" id="upd-step"></div>` +
+      `<div class="modal-actions">` +
+        `<button class="btn" data-act="later">Depois</button>` +
+        `<button class="btn primary" data-act="go">` +
+          (auto.supported ? "Atualizar agora" : "Baixar") +
+        `</button>` +
+      `</div>` +
+    `</div>`;
+
+  bg.addEventListener("click", (ev) => {
+    const act = ev.target.dataset.act;
+    if (ev.target === bg || act === "later") {
+      bg.remove();
+      return;
+    }
+    if (act !== "go") return;
+
+    if (!auto.supported) {
+      // rodando pelo código ou pasta sem permissão: abre o download
+      if (info.url) window.open(info.url, "_blank");
+      bg.remove();
+      return;
+    }
+    runAutoUpdate(bg, info);
+  });
+
+  root.appendChild(bg);
+}
+
+async function runAutoUpdate(bg, info) {
+  const btn = bg.querySelector('[data-act="go"]');
+  const later = bg.querySelector('[data-act="later"]');
+  const bar = bg.querySelector("#upd-bar");
+  const fill = bg.querySelector("#upd-fill");
+  const step = bg.querySelector("#upd-step");
+
+  btn.disabled = true;
+  later.disabled = true;
+  btn.textContent = "Atualizando...";
+  bar.classList.remove("hidden");
+
+  // o .exe puro substitui o que está rodando; o instalador é o plano B
+  const url = info.exe || info.url;
+  await api().start_auto_update(url, info.latest);
+
+  const poll = setInterval(async () => {
+    const p = await api().auto_update_progress();
+    fill.style.width = (p.percent || 0) + "%";
+    if (p.step) step.textContent = p.step;
+
+    if (!p.done) return;
+    clearInterval(poll);
+
+    if (p.ok) {
+      step.textContent = "reiniciando o AptPlayer...";
+      btn.textContent = "Pronto";
+      return;   // o app fecha sozinho em seguida
+    }
+
+    btn.disabled = false;
+    later.disabled = false;
+    btn.textContent = "Tentar de novo";
+    step.textContent = p.error || "falhou";
+    step.classList.add("update-error");
+  }, 400);
+}
 
 $("copy-diag")?.addEventListener("click", async () => {
   if (!diagCache) return;
