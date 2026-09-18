@@ -58,15 +58,29 @@ Deve aparecer *Success. No rows returned*.
 
 ## 3. Pegar as duas chaves
 
-Menu lateral → **Project Settings** (engrenagem) → **API**. Copie:
+Menu lateral → **Project Settings** (engrenagem) → **API Keys**.
 
-- **Project URL** — algo como `https://abcdefgh.supabase.co`
-- **anon public** (em *Project API keys*) — uma chave longa começando com `eyJ...`
+Você vai ver duas seções. Copie a **de cima**:
 
-A chave `anon` é **pública por design** — ela vai dentro do app, e qualquer um
-que baixar consegue lê-la. Quem protege os dados é o RLS do passo 2.
+| Seção | Chave | Usar? |
+|---|---|---|
+| **Publishable key** | `sb_publishable_...` | ✅ **é esta** |
+| **Secret keys** | `sb_secret_...` | ❌ nunca no app |
 
-⚠️ **Nunca** use a chave `service_role`. Ela ignora o RLS.
+> O Supabase renomeou essas chaves. Se você vir a aba *Legacy anon,
+> service_role API keys*, a **anon** equivale à *Publishable* e a
+> **service_role** à *Secret*. Qualquer uma das duas publicáveis funciona;
+> prefira a nova.
+
+A chave publicável é **pública por design** — o próprio painel diz *"can be
+safely shared publicly"*. Ela vai dentro do app, e quem protege os dados é o
+Row Level Security do passo 2.
+
+⚠️ A **Secret key** ignora o RLS e dá acesso total ao banco. Ela nunca entra
+no aplicativo — é só para servidores.
+
+Pegue também a **Project URL**: menu **Project Settings** → **General** (ou
+**Data API**), algo como `https://abcdefgh.supabase.co`.
 
 ## 4. Colar no app
 
@@ -74,8 +88,11 @@ Abra `core/account.py` e preencha as duas linhas do topo:
 
 ```python
 SUPABASE_URL = "https://abcdefgh.supabase.co"
-SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+SUPABASE_KEY = "sb_publishable_iTBx0bhLKrx..."
 ```
+
+Cole a chave **inteira** — o painel mostra ela cortada com `...`, use o botão
+de copiar ao lado dela.
 
 Recompile:
 
@@ -126,8 +143,9 @@ Busque no YouTube por:
   uma visão geral rápida
 
 O painel do Supabase muda de aparência de tempos em tempos; se o vídeo estiver
-diferente da tela, os nomes dos menus (*SQL Editor*, *Project Settings → API*)
-continuam os mesmos.
+diferente da tela, os nomes dos menus (*SQL Editor*, *Project Settings →
+API Keys*) continuam os mesmos. Vídeos antigos falam em "anon key" — hoje ela
+se chama **Publishable key**.
 
 ---
 
@@ -138,6 +156,6 @@ continuam os mesmos.
 | "Conta nao configurada neste build" | Faltou preencher o passo 4 |
 | "Invalid login credentials" | Email ou senha errados |
 | "Email not confirmed" | Confirme pelo link no email, ou desligue no passo 5 |
-| Servidor respondeu 401 | Chave `anon` copiada errada |
+| Servidor respondeu 401 | Chave publicável copiada errada ou incompleta |
 | Servidor respondeu 403 ou 42501 | A policy do passo 2 não foi criada |
 | "Nenhum backup salvo nesta conta ainda" | Clique em **Enviar** primeiro |

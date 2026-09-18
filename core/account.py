@@ -7,8 +7,14 @@ O AptPlayer continua funcionando 100% sem conta. Quem criar uma ganha:
 Nada e enviado automaticamente: a sincronizacao e sempre uma acao do usuario.
 
 Configuracao: preencha SUPABASE_URL e SUPABASE_KEY abaixo (veja SUPABASE.md).
-A chave 'anon' e publica por design - o que protege os dados e a policy de
-Row Level Security, que o SUPABASE.md manda criar.
+
+A chave usada e a "Publishable key" (sb_publishable_...), antigamente chamada
+"anon public". Ela e publica por design - o proprio painel diz que pode ser
+compartilhada. O que protege os dados e a policy de Row Level Security, que o
+SUPABASE.md manda criar.
+
+NUNCA use a "Secret key" (sb_secret_...), antiga "service_role": ela ignora o
+RLS e daria acesso total ao banco.
 """
 
 import json
@@ -21,7 +27,7 @@ from .paths import DATA_DIR
 
 # ---------------------------------------------------------------- config
 SUPABASE_URL = ""      # ex.: https://abcdefgh.supabase.co
-SUPABASE_KEY = ""      # a chave "anon public" do painel
+SUPABASE_KEY = ""      # Publishable key: sb_publishable_... (nao a secret!)
 TIMEOUT = 20
 
 _session_file = DATA_DIR / "session.json"
