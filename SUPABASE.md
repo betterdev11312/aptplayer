@@ -79,8 +79,17 @@ Row Level Security do passo 2.
 ⚠️ A **Secret key** ignora o RLS e dá acesso total ao banco. Ela nunca entra
 no aplicativo — é só para servidores.
 
-Pegue também a **Project URL**: menu **Project Settings** → **General** (ou
-**Data API**), algo como `https://abcdefgh.supabase.co`.
+### A Project URL
+
+O painel novo **não mostra a URL pronta**. Você monta a partir do
+**Project ID**, que fica em **Project Settings → General**:
+
+```
+https://SEU-PROJECT-ID.supabase.co
+```
+
+Exemplo: se o Project ID é `semsacvgnfllfiybakzb`, a URL é
+`https://semsacvgnfllfiybakzb.supabase.co`.
 
 ## 4. Colar no app
 
@@ -100,14 +109,20 @@ Recompile:
 python -m PyInstaller AptPlayer.spec --noconfirm --clean
 ```
 
-## 5. (Opcional) Desligar a confirmação por email
+## 5. Sobre a confirmação por email
 
 Por padrão o Supabase manda um email de confirmação antes de liberar a conta.
-Para testar mais rápido: **Authentication** → **Providers** → **Email** →
-desmarque *Confirm email* → **Save**.
+O app trata isso: ao criar a conta ele avisa *"Confirme pelo link no seu
+email"*, e o login passa a funcionar depois que você clicar.
 
-Para uso real, deixe ligado — impede alguém de criar conta com o email de outra
-pessoa.
+Para testar sem essa etapa: **Authentication** → **Sign In / Providers** →
+**Email** → desmarque *Confirm email* → **Save**.
+
+Para uso real, deixe ligado — impede alguém de criar conta com o email de
+outra pessoa.
+
+> O Supabase também recusa domínios inventados (`@teste.test`). Use um email
+> de verdade.
 
 ---
 

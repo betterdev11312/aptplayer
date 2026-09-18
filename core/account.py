@@ -26,8 +26,8 @@ import requests
 from .paths import DATA_DIR
 
 # ---------------------------------------------------------------- config
-SUPABASE_URL = ""      # ex.: https://abcdefgh.supabase.co
-SUPABASE_KEY = ""      # Publishable key: sb_publishable_... (nao a secret!)
+SUPABASE_URL = "https://semsacvgnfllfiybakzb.supabase.co"
+SUPABASE_KEY = "sb_publishable_iTBx0bhLKrxFHTAFYM-YgQ_vaBsh8tO"
 TIMEOUT = 20
 
 _session_file = DATA_DIR / "session.json"
