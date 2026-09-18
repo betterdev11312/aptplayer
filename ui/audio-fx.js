@@ -3,8 +3,14 @@
  * Usa a Web Audio API: o <audio> passa por uma cadeia de filtros (o
  * equalizer) e por um analisador que alimenta as barras na tela.
  *
- * A cadeia só é montada no primeiro uso — criar um AudioContext antes de
- * qualquer interação é bloqueado pelo navegador.
+ * IMPORTANTE — por que vem desligado por padrão:
+ * createMediaElementSource() DESVIA o áudio do elemento para o AudioContext.
+ * A partir daí o som só sai pela cadeia. Em alguns WebView2 o contexto não
+ * alcança a placa de som, e o resultado é silêncio total.
+ *
+ * Por isso a cadeia só é montada quando o usuário liga explicitamente em
+ * Ajustes, e existe um teste de áudio ao lado do botão. Desligar remove a
+ * cadeia e devolve o som ao caminho normal do navegador.
  */
 
 const fx = {
@@ -16,8 +22,9 @@ const fx = {
   data: null,         // buffer de frequências
   raf: 0,
   canvas: null,
-  view: "bars",       // bars | wave | off
+  view: "off",        // bars | wave | off
   ready: false,
+  enabled: false,     // só monta a cadeia se o usuário permitir
 };
 
 /* Frequências centrais: graves à esquerda, agudos à direita. */
@@ -43,6 +50,7 @@ const EQ_PRESETS = {
 
 function fxSetup() {
   if (fx.ready) return true;
+  if (!fx.enabled) return false;   // desligado: audio segue o caminho normal
   try {
     const Ctx = window.AudioContext || window.webkitAudioContext;
     if (!Ctx) return false;
@@ -206,6 +214,40 @@ function fxLevel() {
   return sum / (24 * 255);
 }
 
+/** Liga a cadeia (equalizer + visualização). Devolve se conseguiu. */
+function fxEnable() {
+  fx.enabled = true;
+  try { localStorage.setItem("aptplayer-fx", "on"); } catch {}
+  const ok = fxSetup();
+  if (ok) {
+    fxResume();
+    const saved = loadEq();
+    if (saved) saved.gains.forEach((db, i) => {
+      if (fx.bands[i]) fx.bands[i].gain.value = db;
+    });
+  } else {
+    fx.enabled = false;
+  }
+  return ok;
+}
+
+/** Desliga e devolve o áudio ao caminho normal. Exige recarregar a página:
+ *  createMediaElementSource não pode ser desfeito no mesmo elemento. */
+function fxDisable() {
+  fx.enabled = false;
+  try { localStorage.setItem("aptplayer-fx", "off"); } catch {}
+  cancelAnimationFrame(fx.raf);
+  fx.raf = 0;
+  fxSetView("off");
+  if (fx.ready) {
+    // zera os filtros para nao alterar o som ate o proximo reinicio
+    fx.bands.forEach((band) => { band.gain.value = 0; });
+    if (fx.gain) fx.gain.gain.value = 1;
+    return "restart";   // a interface avisa que precisa reabrir o app
+  }
+  return "ok";
+}
+
 /* ===== Ligações ===== */
 
 function initAudioFx() {
@@ -219,11 +261,16 @@ function initAudioFx() {
     window.addEventListener("resize", resize);
   }
 
-  try {
-    fx.view = localStorage.getItem("aptplayer-viz") || "bars";
-  } catch { fx.view = "bars"; }
+  let wanted = "off";
+  try { wanted = localStorage.getItem("aptplayer-fx") || "off"; } catch {}
+  fx.enabled = wanted === "on";
 
-  // a cadeia só pode ser montada depois que o usuário interage
+  try {
+    fx.view = fx.enabled ? (localStorage.getItem("aptplayer-viz") || "bars") : "off";
+  } catch { fx.view = "off"; }
+
+  if (!fx.enabled) return;   // nada de AudioContext: o som sai direto
+
   audio.addEventListener("play", () => {
     if (fxSetup()) {
       fxResume();

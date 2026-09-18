@@ -169,6 +169,27 @@ function renderEq() {
   }
 }
 
+$("fx-toggle")?.addEventListener("change", (ev) => {
+  const panel = $("eq-panel");
+  if (ev.target.checked) {
+    const ok = fxEnable();
+    panel?.classList.toggle("hidden", !ok);
+    if (!ok) {
+      ev.target.checked = false;
+      return toast("este computador não suporta o processamento de áudio", true);
+    }
+    renderEq();
+    fxSetView($("viz-mode")?.value || "bars");
+    toast("equalizer ligado — se o som sumir, desligue aqui e reabra o app");
+  } else {
+    const result = fxDisable();
+    panel?.classList.add("hidden");
+    toast(result === "restart"
+      ? "desligado — reabra o app para o som voltar ao normal"
+      : "equalizer desligado");
+  }
+});
+
 $("viz-mode")?.addEventListener("change", (ev) => {
   fxSetView(ev.target.value);
   toast(`visualização: ${ev.target.selectedOptions[0].textContent.toLowerCase()}`);
@@ -194,12 +215,19 @@ $("hotkeys-toggle")?.addEventListener("change", async (ev) => {
 });
 
 async function initAudioSettings() {
-  renderEq();
+  let fxOn = false;
+  try { fxOn = localStorage.getItem("aptplayer-fx") === "on"; } catch {}
+
+  const toggleFx = $("fx-toggle");
+  if (toggleFx) toggleFx.checked = fxOn;
+  $("eq-panel")?.classList.toggle("hidden", !fxOn);
+  if (fxOn) renderEq();
 
   const viz = $("viz-mode");
   if (viz) {
     try { viz.value = localStorage.getItem("aptplayer-viz") || "bars"; }
     catch { viz.value = "bars"; }
+    viz.disabled = !fxOn;
   }
 
   const toggle = $("hotkeys-toggle");

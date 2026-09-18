@@ -15,7 +15,7 @@ from .paths import DATA_DIR
 VERSION = "1.3.0"
 
 # Site do projeto (Cloudflare Workers). Deixe vazio para desligar a verificacao.
-SITE_URL = "https://aptplayerideias.aptsva.workers.dev"
+SITE_URL = "https://betterdev11312.github.io/aptplayer"
 UPDATE_URL = f"{SITE_URL}/version.json" if SITE_URL else ""
 TIMEOUT = 8
 

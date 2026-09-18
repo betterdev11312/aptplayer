@@ -23,7 +23,12 @@ a = Analysis(
     ],
     hookspath=[],
     runtime_hooks=[],
-    excludes=["tkinter", "matplotlib", "numpy", "PIL", "pytest", "setuptools"],
+    excludes=[
+        "tkinter", "matplotlib", "numpy", "PIL", "pytest", "setuptools",
+        # O yt-dlp so usa cryptography para DRM e cookies do navegador -
+        # nada disso e usado aqui, e sao ~10 MB.
+        "cryptography", "Cryptodome", "secretstorage",
+    ],
     noarchive=False,
 )
 

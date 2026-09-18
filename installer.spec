@@ -15,7 +15,8 @@ a = Analysis(
         "webview.platforms.winforms",
         "clr_loader",
     ],
-    excludes=["tkinter", "matplotlib", "numpy", "PIL", "yt_dlp", "requests"],
+    excludes=["tkinter", "matplotlib", "numpy", "PIL", "yt_dlp", "requests",
+              "cryptography", "Cryptodome", "secretstorage"],
     noarchive=False,
 )
 

@@ -273,14 +273,25 @@
 
       <div class="section-title" style="margin-top:28px">// Áudio</div>
       <div class="ai-card" style="margin-bottom:14px">
-        <h3>Equalizer</h3>
-        <div class="eq-presets" id="eq-presets"></div>
-        <div class="eq-bands" id="eq-bands"></div>
+        <h3>Equalizer e visualização</h3>
+        <p>Ajusta graves e agudos e mostra as barras reagindo à música.
+           Vem desligado porque em alguns computadores o processamento de
+           áudio do navegador não alcança a placa de som — se ficar mudo,
+           desligue aqui e reabra o app.</p>
+        <label class="switch">
+          <input type="checkbox" id="fx-toggle">
+          <span>Ativar processamento de áudio</span>
+        </label>
+        <div id="eq-panel" class="hidden">
+          <div class="eq-presets" id="eq-presets"></div>
+          <div class="eq-bands" id="eq-bands"></div>
+        </div>
       </div>
       <div class="ai-grid">
         <div class="ai-card">
           <h3>Visualização</h3>
-          <p>Barras que reagem à música, no player.</p>
+          <p>Estilo das barras no player. Requer o processamento de áudio
+             ligado acima.</p>
           <select id="viz-mode" class="select">
             <option value="bars">Barras</option>
             <option value="wave">Onda</option>
