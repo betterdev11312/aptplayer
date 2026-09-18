@@ -1134,3 +1134,46 @@ body.cat-menu-open .cat-bubble { opacity: 0; }
   display: flex; justify-content: space-between; margin-top: 6px;
   font-family: var(--mono); font-size: 10px; color: var(--text-faint);
 }
+
+
+/* ==================== SLEEP TIMER ==================== */
+.sleep-row { display: flex; gap: 6px; flex-wrap: wrap; }
+.sleep-btn {
+  padding: 8px 14px; font-size: 12px; font-weight: 600;
+  border: 1px solid var(--line); background: var(--bg-deep);
+  color: var(--text-dim); cursor: pointer; transition: all .14s;
+  font-family: var(--mono);
+}
+.sleep-btn:hover { border-color: var(--cyan); color: var(--cyan); }
+.sleep-btn.active {
+  border-color: var(--yellow); color: var(--yellow); box-shadow: var(--glow-y);
+}
+#sleep-badge { color: var(--cyan); border-color: var(--line); }
+
+/* ==================== CÓDIGO COMPARTILHADO ==================== */
+.share-code {
+  background: var(--bg-deep); border: 1px solid var(--line);
+  padding: 12px 14px; margin-bottom: 12px;
+  font-family: var(--mono); font-size: 11px; color: var(--cyan);
+  word-break: break-all; max-height: 110px; overflow-y: auto;
+  user-select: all; line-height: 1.5;
+}
+.share-hint {
+  font-size: 12px; color: var(--text-dim); margin-bottom: 12px; line-height: 1.5;
+}
+
+
+/* ==================== TRADUÇÃO DE LETRAS ==================== */
+.lyrics-actions { display: flex; align-items: center; gap: 6px; }
+.lyrics-select {
+  background: var(--bg-deep); border: 1px solid var(--line);
+  color: var(--text-dim); font: inherit; font-size: 11px;
+  padding: 5px 7px; max-width: 120px; cursor: pointer; outline: none;
+}
+.lyrics-select:hover, .lyrics-select:focus { border-color: var(--cyan); color: var(--text); }
+#lyrics-translate.on { color: var(--yellow); filter: drop-shadow(0 0 6px rgba(252,238,10,.6)); }
+.lyric-line.translated { font-style: normal; }
+.lyrics-note {
+  font-family: var(--mono); font-size: 10.5px; color: var(--text-faint);
+  padding: 0 24px 12px; letter-spacing: .5px;
+}

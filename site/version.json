@@ -1,5 +1,5 @@
 {
-  "version": "1.3.0",
-  "url": "https://aptplayerideias.aptsva.workers.dev/AptPlayer-Setup.zip",
-  "notes": "Equalizer, visualizacao de audio, Retrospectiva e teclas de midia globais."
+  "version": "1.4.0",
+  "url": "https://github.com/betterdev11312/aptplayer/releases/download/v1.4.0/AptPlayer-Setup.exe",
+  "notes": "Transicao entre musicas, timer para dormir, compartilhar playlists, traducao de letras em 89 idiomas e interface em 8 idiomas."
 }

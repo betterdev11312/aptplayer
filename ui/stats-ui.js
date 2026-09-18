@@ -215,6 +215,10 @@ $("hotkeys-toggle")?.addEventListener("change", async (ev) => {
 });
 
 async function initAudioSettings() {
+  renderSleep();
+  const fadeSel = $("fade-seconds");
+  if (fadeSel) fadeSel.value = String(fade.seconds || 0);
+
   let fxOn = false;
   try { fxOn = localStorage.getItem("aptplayer-fx") === "on"; } catch {}
 
@@ -243,3 +247,122 @@ async function restoreHotkeys() {
   try { want = localStorage.getItem("aptplayer-hotkeys") || "off"; } catch {}
   if (want === "on") await api().hotkeys_start();
 }
+
+/* ===== Transição entre músicas ===== */
+
+$("fade-seconds")?.addEventListener("change", (ev) => {
+  fade.seconds = Number(ev.target.value) || 0;
+  fadeSave();
+  toast(fade.seconds
+    ? `transição de ${fade.seconds}s entre as músicas`
+    : "transição desligada");
+});
+
+/* ===== Sleep timer ===== */
+
+const SLEEP_OPTIONS = [15, 30, 45, 60, 90];
+
+function renderSleep() {
+  const box = $("sleep-buttons");
+  if (!box || box.children.length) return;
+
+  SLEEP_OPTIONS.forEach((minutes) => {
+    const btn = document.createElement("button");
+    btn.className = "sleep-btn";
+    btn.dataset.min = minutes;
+    btn.textContent = `${minutes}min`;
+    btn.addEventListener("click", () => {
+      const active = btn.classList.contains("active");
+      box.querySelectorAll(".sleep-btn").forEach((b) => b.classList.remove("active"));
+      if (active) {
+        sleepCancel();
+        toast("timer cancelado");
+      } else {
+        btn.classList.add("active");
+        sleepStart(minutes);
+      }
+    });
+    box.appendChild(btn);
+  });
+
+  const off = document.createElement("button");
+  off.className = "sleep-btn";
+  off.textContent = "cancelar";
+  off.addEventListener("click", () => {
+    box.querySelectorAll(".sleep-btn").forEach((b) => b.classList.remove("active"));
+    sleepCancel();
+    toast("timer cancelado");
+  });
+  box.appendChild(off);
+}
+
+/* ===== Compartilhar playlist ===== */
+
+$("share-playlist")?.addEventListener("click", async () => {
+  if (!state.playlistId) return;
+  const res = await api().share_playlist(state.playlistId);
+  if (!res.ok) return toast(res.error, true);
+
+  const root = $("modal-root");
+  const bg = document.createElement("div");
+  bg.className = "modal-bg";
+  bg.innerHTML =
+    `<div class="modal" style="width:480px">` +
+      `<h3>Compartilhar "${esc(res.name)}"</h3>` +
+      `<div class="share-hint">` +
+        `${res.count} faixas. Copie o código e mande para quem usa o ` +
+        `AptPlayer — lá é só colar em Biblioteca → Colar código.` +
+      `</div>` +
+      `<div class="share-code" id="share-out">${esc(res.code)}</div>` +
+      `<div class="modal-actions">` +
+        `<button class="btn" data-act="cancel">Fechar</button>` +
+        `<button class="btn primary" data-act="copy">Copiar código</button>` +
+      `</div>` +
+    `</div>`;
+
+  bg.addEventListener("click", async (ev) => {
+    const act = ev.target.dataset.act;
+    if (ev.target === bg || act === "cancel") bg.remove();
+    if (act === "copy") {
+      try {
+        await navigator.clipboard.writeText(res.code);
+        toast("código copiado — mande para seu amigo");
+      } catch {
+        toast("selecione o código e copie com Ctrl+C", true);
+      }
+    }
+  });
+  root.appendChild(bg);
+});
+
+$("open-shared")?.addEventListener("click", () => {
+  modal({
+    title: "Colar código de playlist",
+    fields: [{ placeholder: "APT1:..." }],
+    confirmText: "Ver",
+    onConfirm: async ([code]) => {
+      if (!code) return;
+      const preview = await api().preview_shared(code);
+      if (!preview.ok) return toast(preview.error, true);
+
+      const amostra = preview.sample
+        .map((s) => `${s.artist} — ${s.title}`)
+        .join(" · ");
+
+      modal({
+        title: `${preview.name} (${preview.count} faixas)`,
+        fields: [{ value: preview.name, placeholder: "nome da playlist" }],
+        confirmText: "Importar",
+        onConfirm: async ([name]) => {
+          const res = await api().import_shared(code, name);
+          if (!res.ok) return toast(res.error, true);
+          await loadPlaylists();
+          catOn.playlistCreated();
+          toast(`"${res.name}" importada — ${res.count} faixas`);
+          openPlaylist(res.id);
+        },
+      });
+      toast(amostra);
+    },
+  });
+});

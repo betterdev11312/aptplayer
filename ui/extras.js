@@ -9,6 +9,12 @@ const lyrics = { open: false, data: null, index: -1, videoId: null };
 
 async function loadLyrics(track) {
   if (!track) return;
+  // faixa nova: descarta a traducao da anterior
+  if (typeof lyricsTr !== "undefined") {
+    lyricsTr.on = false;
+    lyricsTr.original = null;
+    $("lyrics-translate")?.classList.remove("on");
+  }
   lyrics.videoId = track.video_id;
   lyrics.data = null;
   lyrics.index = -1;
@@ -164,4 +170,139 @@ document.addEventListener("DOMContentLoaded", () => {
   $("btn-lyrics")?.addEventListener("click", () => toggleLyrics());
   $("lyrics-close")?.addEventListener("click", () => toggleLyrics(false));
   audio.addEventListener("timeupdate", syncLyrics);
+});
+
+/* ===== Tradução de letras ===== */
+
+const lyricsTr = { on: false, lang: "pt", original: null, langs: [] };
+
+async function loadTranslateLanguages() {
+  if (lyricsTr.langs.length) return lyricsTr.langs;
+  const res = await api().translate_languages();
+  lyricsTr.langs = res.ok ? res.languages : [];
+  return lyricsTr.langs;
+}
+
+function savedLyricsLang() {
+  try { return localStorage.getItem("aptplayer-lyrics-lang") || "pt"; }
+  catch { return "pt"; }
+}
+
+async function fillLanguageSelects() {
+  const langs = await loadTranslateLanguages();
+  const saved = savedLyricsLang();
+  lyricsTr.lang = saved;
+
+  const options = langs
+    .map((l) => `<option value="${esc(l.code)}">${esc(l.name)}</option>`)
+    .join("");
+
+  ["lyrics-lang", "lyrics-lang-default"].forEach((id) => {
+    const select = $(id);
+    if (!select || select.children.length) return;
+    select.innerHTML = options;
+    select.value = saved;
+    select.addEventListener("change", (ev) => {
+      lyricsTr.lang = ev.target.value;
+      try { localStorage.setItem("aptplayer-lyrics-lang", ev.target.value); } catch {}
+      // mantém os dois seletores em sincronia
+      ["lyrics-lang", "lyrics-lang-default"].forEach((other) => {
+        if (other !== id && $(other)) $(other).value = ev.target.value;
+      });
+      if (lyricsTr.on) translateCurrentLyrics();
+    });
+  });
+
+  // idiomas da interface
+  const ui = $("ui-lang");
+  if (ui && !ui.children.length) {
+    ui.innerHTML = uiLanguages()
+      .map((l) => `<option value="${l.code}">${esc(l.name)}</option>`)
+      .join("");
+    try { ui.value = localStorage.getItem("aptplayer-lang") || "pt"; } catch {}
+    ui.addEventListener("change", (ev) => {
+      applyLanguage(ev.target.value);
+      toast(`idioma: ${I18N[ev.target.value]._name}`);
+    });
+  }
+}
+
+function renderLyricLines(lines, translated) {
+  const box = $("lyrics-body");
+  box.innerHTML = "";
+  lines.forEach((item, i) => {
+    const el = document.createElement("div");
+    el.className = "lyric-line" + (translated ? " translated" : "");
+    el.dataset.i = i;
+    el.textContent = item.line || "\u266A";
+    el.addEventListener("click", () => { audio.currentTime = item.time; });
+    box.appendChild(el);
+  });
+}
+
+async function translateCurrentLyrics() {
+  const track = state.queue[state.index];
+  if (!track) return toast("nada tocando", true);
+
+  const btn = $("lyrics-translate");
+  btn.classList.add("on");
+  const note = document.createElement("div");
+  note.className = "lyrics-note";
+  note.textContent = "traduzindo...";
+  $("lyrics-body").prepend(note);
+
+  const res = await api().translate_lyrics(
+    track.artist, track.title, track.duration || 0, lyricsTr.lang);
+
+  note.remove();
+
+  if (!res.ok) {
+    btn.classList.remove("on");
+    lyricsTr.on = false;
+    return toast(res.error, true);
+  }
+
+  // guarda o original para poder voltar
+  if (!lyricsTr.original) lyricsTr.original = lyrics.data;
+
+  lyricsTr.on = true;
+  const langName = lyricsTr.langs.find((l) => l.code === lyricsTr.lang)?.name || lyricsTr.lang;
+
+  if (res.synced) {
+    lyrics.data = { synced: true, lines: res.lines, plain: "" };
+    lyrics.index = -1;
+    renderLyricLines(res.lines, true);
+  } else {
+    lyrics.data = { synced: false, lines: [], plain: res.plain };
+    $("lyrics-body").innerHTML = `<div class="lyrics-plain">${esc(res.plain)}</div>`;
+  }
+
+  const tag = document.createElement("div");
+  tag.className = "lyrics-note";
+  tag.textContent = `traduzido para ${langName}`;
+  $("lyrics-body").prepend(tag);
+  toast(`letra traduzida para ${langName}`);
+}
+
+function restoreOriginalLyrics() {
+  if (!lyricsTr.original) return;
+  lyrics.data = lyricsTr.original;
+  lyrics.index = -1;
+  lyricsTr.on = false;
+  lyricsTr.original = null;
+  $("lyrics-translate").classList.remove("on");
+
+  if (lyrics.data.synced && lyrics.data.lines.length) {
+    renderLyricLines(lyrics.data.lines, false);
+  } else {
+    $("lyrics-body").innerHTML = `<div class="lyrics-plain">${esc(lyrics.data.plain)}</div>`;
+  }
+  toast("letra original");
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  $("lyrics-translate")?.addEventListener("click", () => {
+    if (lyricsTr.on) restoreOriginalLyrics();
+    else translateCurrentLyrics();
+  });
 });

@@ -7,7 +7,8 @@ window.pywebview.api.<nome>(...).
 from pathlib import Path
 
 from . import (account, ai, cache, discover, hotkeys, library, lyrics,
-               radio, spotify, stats, updater, youtube)
+               radio, share, spotify, stats, translate, updater,
+               youtube)
 from .paths import COVERS_DIR
 
 
@@ -646,3 +647,69 @@ class Api:
         if window:
             window.minimize()
         return {"ok": True}
+
+    # --- compartilhar playlist --------------------------------------------
+
+    def share_playlist(self, playlist_id: int) -> dict:
+        """Gera o codigo que outra pessoa cola no AptPlayer dela."""
+        return share.export_playlist(int(playlist_id))
+
+    def preview_shared(self, code: str) -> dict:
+        """Mostra o que tem no codigo antes de importar."""
+        parsed = share.parse_code(code)
+        if not parsed.get("ok"):
+            return parsed
+        return {
+            "ok": True,
+            "name": parsed["name"],
+            "count": parsed["count"],
+            "sample": parsed["items"][:5],
+        }
+
+    def import_shared(self, code: str, name: str = "") -> dict:
+        return share.import_code(code, name)
+
+    # --- traducao ---------------------------------------------------------
+
+    def translate_languages(self) -> dict:
+        """Idiomas disponiveis para traduzir letras."""
+        return {"ok": True, "languages": translate.languages()}
+
+    def translate_text(self, text: str, target: str) -> dict:
+        """Traduz um texto (a letra) para o idioma escolhido."""
+        try:
+            return translate.translate(text, target)
+        except Exception as exc:
+            return {"ok": False, "error": str(exc)}
+
+    def translate_lyrics(self, artist: str, title: str, duration: int,
+                         target: str) -> dict:
+        """Busca a letra e ja devolve traduzida, linha a linha quando da."""
+        found = lyrics.fetch(artist, title, int(duration or 0))
+        if not found:
+            return {"ok": False, "error": "Letra nao encontrada."}
+
+        if found["synced"] and found["lines"]:
+            source = chr(10).join(line["line"] for line in found["lines"])
+        else:
+            source = found["plain"]
+
+        result = translate.translate(source, target)
+        if not result.get("ok"):
+            return result
+
+        translated = result["text"].splitlines()
+
+        # letra sincronizada: casa cada linha traduzida com seu tempo
+        if found["synced"] and found["lines"]:
+            lines = []
+            for index, line in enumerate(found["lines"]):
+                lines.append({
+                    "time": line["time"],
+                    "line": translated[index] if index < len(translated) else "",
+                })
+            return {"ok": True, "synced": True, "lines": lines,
+                    "engine": result.get("engine", "")}
+
+        return {"ok": True, "synced": False, "plain": result["text"],
+                "engine": result.get("engine", "")}

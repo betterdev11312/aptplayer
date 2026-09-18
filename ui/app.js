@@ -1,7 +1,7 @@
 /* AptPlayer - interface Cyberpunk */
 
 const $ = (id) => document.getElementById(id);
-const audio = $("audio");
+let audio = $("audio");   // trocavel: o crossfade alterna dois elementos
 
 const state = {
   queue: [],
@@ -240,11 +240,24 @@ async function playTrack(track, list = null) {
   $("np-artist").textContent = track.artist;
   if (res.source === "cache") $("source-badge").classList.remove("hidden");
 
+  onTrackStarted(track);
+}
+
+/** Interface e registros quando uma faixa comeca.
+ *  Usado tanto pelo playTrack quanto pelo crossfade. */
+function onTrackStarted(track) {
+  $("np-title").textContent = track.title;
+  $("np-artist").textContent = track.artist;
+  $("np-art").src = track.thumbnail || "";
+  $("np-art").classList.toggle("hidden", !track.thumbnail);
+
   api().play_started(track);
   updateFavButton(track);
   updateMediaSession(track);
-  if (lyrics.open) loadLyrics(track);
+  if (typeof lyrics !== "undefined" && lyrics.open) loadLyrics(track);
   catOn.play(track, (track.play_count || 0) >= 2);
+  renderQueue();
+  markPlaying();
 
   const next = state.queue[state.index + 1];
   if (next) api().prefetch(next.video_id);
@@ -297,27 +310,35 @@ $("btn-repeat").addEventListener("click", (e) => {
   toast(state.repeat ? "Repetição ligada" : "Repetição desligada");
 });
 
-audio.addEventListener("play", () => {
-  $("icon-play").classList.add("hidden");
-  $("icon-pause").classList.remove("hidden");
-});
-audio.addEventListener("pause", () => {
-  $("icon-play").classList.remove("hidden");
-  $("icon-pause").classList.add("hidden");
-  catOn.pause();
-});
-audio.addEventListener("ended", () => playNext(true));
-audio.addEventListener("error", () => {
-  if (audio.src) toast("Erro ao reproduzir o áudio.", true);
-});
-audio.addEventListener("timeupdate", () => {
-  const pct = audio.duration ? (audio.currentTime / audio.duration) * 100 : 0;
-  $("progress-fill").style.width = pct + "%";
-  $("time-current").textContent = fmt(audio.currentTime);
-});
-audio.addEventListener("loadedmetadata", () => {
-  $("time-total").textContent = fmt(audio.duration);
-});
+/** Liga os eventos do player a um elemento <audio>.
+ *  Chamado de novo quando o crossfade troca de elemento. */
+function bindAudioEvents(el) {
+  el.addEventListener("play", () => {
+    $("icon-play").classList.add("hidden");
+    $("icon-pause").classList.remove("hidden");
+  });
+  el.addEventListener("pause", () => {
+    $("icon-play").classList.remove("hidden");
+    $("icon-pause").classList.add("hidden");
+    catOn.pause();
+  });
+  el.addEventListener("ended", () => playNext(true));
+  el.addEventListener("error", () => {
+    if (el.src) toast("Erro ao reproduzir o áudio.", true);
+  });
+  el.addEventListener("timeupdate", () => {
+    const pct = el.duration ? (el.currentTime / el.duration) * 100 : 0;
+    $("progress-fill").style.width = pct + "%";
+    $("time-current").textContent = fmt(el.currentTime);
+    if (typeof syncLyrics === "function") syncLyrics();
+    if (typeof fadeWatch === "function") fadeWatch();
+  });
+  el.addEventListener("loadedmetadata", () => {
+    $("time-total").textContent = fmt(el.duration);
+  });
+}
+
+bindAudioEvents(audio);
 
 const ratio = (bar, ev) => {
   const r = bar.getBoundingClientRect();
@@ -333,6 +354,7 @@ $("volume-bar").addEventListener("click", (ev) => {
   audio.muted = false;
   $("btn-mute").classList.remove("on");
   $("volume-fill").style.width = v * 100 + "%";
+  if (typeof fadeSetBaseVolume === "function") fadeSetBaseVolume(v);
 });
 $("btn-mute").addEventListener("click", () => {
   audio.muted = !audio.muted;
@@ -836,7 +858,10 @@ function boot() {
   refreshCacheInfo();
   loadHome();
   setupMediaKeys();
+  initLanguage();
+  fillLanguageSelects();
   initAudioFx();
+  fadeInit();
   restoreHotkeys();
   catInit();
 }
