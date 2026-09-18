@@ -113,8 +113,40 @@ def _auth_call(path: str, payload: dict) -> dict:
     if response.status_code >= 400:
         message = data.get("msg") or data.get("error_description") \
             or data.get("message") or "Falha na autenticacao."
-        return {"ok": False, "error": message}
+        return {"ok": False, "error": _friendly(message)}
     return {"ok": True, "data": data}
+
+
+# O Supabase responde em ingles e com jargao; traduzimos o que o usuario ve.
+_MESSAGES = {
+    "email rate limit exceeded":
+        "Limite de emails do Supabase atingido (sao poucos por hora no plano "
+        "gratuito). Tente daqui a uma hora, ou desligue a confirmacao por "
+        "email no painel - veja SUPABASE.md.",
+    "over_email_send_rate_limit":
+        "Muitos emails em pouco tempo. Aguarde alguns minutos.",
+    "invalid login credentials":
+        "Email ou senha incorretos.",
+    "email not confirmed":
+        "Confirme sua conta pelo link que chegou no seu email.",
+    "user already registered":
+        "Ja existe uma conta com esse email. Use 'Entrar'.",
+    "password should be at least 6 characters":
+        "A senha precisa ter pelo menos 6 caracteres.",
+    "signups not allowed":
+        "Criacao de contas desativada no painel do Supabase.",
+}
+
+
+def _friendly(message: str) -> str:
+    """Traduz as mensagens conhecidas do Supabase para portugues."""
+    lowered = (message or "").strip().lower()
+    for key, text in _MESSAGES.items():
+        if key in lowered:
+            return text
+    if "invalid" in lowered and "email" in lowered:
+        return "Email invalido. Use um endereco real."
+    return message
 
 
 def sign_up(email: str, password: str) -> dict:

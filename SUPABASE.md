@@ -174,3 +174,18 @@ se chama **Publishable key**.
 | Servidor respondeu 401 | Chave publicável copiada errada ou incompleta |
 | Servidor respondeu 403 ou 42501 | A policy do passo 2 não foi criada |
 | "Nenhum backup salvo nesta conta ainda" | Clique em **Enviar** primeiro |
+| "Limite de emails do Supabase atingido" | O plano gratuito envia poucos emails por hora. Espere ~1h ou desligue a confirmação (passo 5) |
+
+### O limite de emails
+
+O SMTP compartilhado do plano gratuito manda **poucos emails por hora** —
+contando confirmações de conta e recuperações de senha. Ao testar várias
+criações de conta seguidas, ele bloqueia temporariamente.
+
+Três saídas:
+
+1. **Esperar** — a cota renova sozinha em cerca de uma hora
+2. **Desligar a confirmação** (passo 5) — contas entram na hora, sem email
+3. **SMTP próprio** — em *Project Settings → Authentication → SMTP Settings*
+   dá para ligar um serviço como Resend ou Brevo (também têm plano gratuito) e
+   o limite sobe muito. Só vale se o app for ter vários usuários.
