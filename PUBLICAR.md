@@ -22,8 +22,9 @@ Em um ou dois minutos o site fica no ar em:
 2. Preencha:
    - **Choose a tag**: digite `v1.3.0` e clique em *Create new tag*
    - **Release title**: `AptPlayer 1.3.0`
-   - **Describe this release**: cole as novidades (estão no site, seção
-     *Registro de atualizações*)
+   - **Describe this release**: é o campo grande abaixo do título. Cole o
+     conteúdo de [RELEASE-NOTES.md](RELEASE-NOTES.md) — já está pronto.
+     (Esse campo é opcional; sem ele o release funciona igual.)
 3. Arraste os quatro arquivos da pasta `site/` para a área de anexos:
    - `AptPlayer-Setup.exe`
    - `AptPlayer-Setup.zip`
