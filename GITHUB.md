@@ -1,43 +1,15 @@
-# Publicar no GitHub
+# GitHub
 
-O repositório local já está pronto: `git init` feito, `.gitignore` ajustado e
-o primeiro commit criado com os 49 arquivos do projeto (1,9 MB — os `.exe`
-ficaram de fora de propósito).
+O projeto está publicado em **https://github.com/betterdev11312/aptplayer**
 
-Falta só criar o repositório no site e enviar.
+O `remote` já está configurado neste repositório local, então daqui pra frente
+basta commitar e dar push.
 
 ---
 
-## 1. Criar o repositório (1 minuto)
+## Dia a dia
 
-1. Entre em **https://github.com/new** (faça login ou crie a conta — é grátis)
-2. Preencha:
-   - **Repository name**: `aptplayer`
-   - **Description**: `Player de música com IA local, sem conta e sem API key`
-   - **Public** ou **Private** — tanto faz para o projeto funcionar
-3. **NÃO marque** nenhuma das caixas de *Initialize this repository*
-   (README, .gitignore, license). Seu projeto já tem tudo, e marcar cria
-   conflito no primeiro push.
-4. Clique em **Create repository**
-
-## 2. Enviar o código
-
-O GitHub mostra uma tela com comandos. Ignore e use estes, no terminal dentro
-da pasta do projeto (troque `SEU-USUARIO`):
-
-```bash
-git remote add origin https://github.com/SEU-USUARIO/aptplayer.git
-git push -u origin main
-```
-
-Na primeira vez o Git vai pedir login. Vai abrir uma janela do navegador —
-autorize por ali (é o jeito mais simples; não precisa criar token manualmente).
-
-Pronto. Atualize a página do GitHub e o código estará lá.
-
-## 3. Daqui pra frente
-
-Sempre que mudar algo e quiser salvar:
+Sempre que mudar algo e quiser salvar no GitHub:
 
 ```bash
 git add -A
@@ -51,6 +23,10 @@ Para ver o histórico: `git log --oneline`
 Para desfazer mudanças não commitadas num arquivo: `git checkout -- arquivo`
 
 ---
+
+> **Nota sobre a tela de comandos**: ela só aparece em repositório vazio. Como
+> o repo foi criado com um README, o GitHub já mostrou a visualização normal.
+> Os comandos acima funcionam do mesmo jeito.
 
 ## Por que os .exe ficaram de fora
 
