@@ -29,3 +29,6 @@ secrets.json
 Thumbs.db
 desktop.ini
 .DS_Store
+
+# Pacotes do site (grandes)
+*.zip

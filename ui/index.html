@@ -41,6 +41,10 @@
         <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></svg>
         Histórico
       </button>
+      <button class="nav-item" data-view="stats">
+        <svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>
+        Retrospectiva
+      </button>
       <button class="nav-item" data-view="chat">
         <svg viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-11.6 7.1L3 21l1.9-6.4A8 8 0 1 1 21 12z"/></svg>
         Chat IA
@@ -120,6 +124,7 @@
       <header class="view-head">
         <div><h1>Biblio<span>teca</span></h1></div>
         <div class="head-actions">
+          <button class="btn" id="open-spotify">Importar do Spotify</button>
           <select id="library-order" class="select">
             <option value="recent">Recentes</option>
             <option value="played">Mais tocadas</option>
@@ -128,6 +133,22 @@
           </select>
         </div>
       </header>
+      <div class="import-box hidden" id="spotify-box">
+        <div class="import-head">
+          <span>Cole o link de uma playlist ou álbum público do Spotify</span>
+          <button class="icon-btn" id="close-spotify" title="Fechar">
+            <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>
+          </button>
+        </div>
+        <div class="import-row">
+          <input id="spotify-url" type="text" placeholder="https://open.spotify.com/playlist/...">
+          <button class="btn primary" id="spotify-btn">Importar</button>
+        </div>
+        <div class="import-hint">
+          Cada faixa é procurada no YouTube — leva alguns segundos por música.
+        </div>
+      </div>
+
       <div id="library-list" class="track-list"></div>
     </section>
 
@@ -162,6 +183,25 @@
         </div>
       </div>
       <div id="playlist-tracks" class="track-list"></div>
+    </section>
+
+    <!-- RETROSPECTIVA -->
+    <section class="view" id="view-stats">
+      <header class="view-head">
+        <div>
+          <h1>Retros<span>pectiva</span></h1>
+          <p class="sub">Seus números, calculados aqui na sua máquina</p>
+        </div>
+        <div class="head-actions">
+          <select id="stats-period" class="select">
+            <option value="0">Desde sempre</option>
+            <option value="7">Últimos 7 dias</option>
+            <option value="30">Últimos 30 dias</option>
+            <option value="365">Último ano</option>
+          </select>
+        </div>
+      </header>
+      <div id="stats-body"></div>
     </section>
 
     <!-- CHAT IA -->
@@ -210,14 +250,6 @@
         </div>
 
         <div class="ai-card">
-          <h3>Importar do Spotify</h3>
-          <p>Cole o link de uma playlist ou álbum público. Cada faixa é
-             procurada no YouTube.</p>
-          <input id="spotify-url" type="text" placeholder="https://open.spotify.com/playlist/...">
-          <button class="btn primary" id="spotify-btn">Importar</button>
-        </div>
-
-        <div class="ai-card">
           <h3>Organizar</h3>
           <p>Classifica gênero e clima das faixas sem tag.</p>
           <button class="btn primary" id="ai-tag-btn">Classificar</button>
@@ -238,6 +270,33 @@
 
       <div class="section-title">// Temas</div>
       <div class="theme-grid" id="theme-grid"></div>
+
+      <div class="section-title" style="margin-top:28px">// Áudio</div>
+      <div class="ai-card" style="margin-bottom:14px">
+        <h3>Equalizer</h3>
+        <div class="eq-presets" id="eq-presets"></div>
+        <div class="eq-bands" id="eq-bands"></div>
+      </div>
+      <div class="ai-grid">
+        <div class="ai-card">
+          <h3>Visualização</h3>
+          <p>Barras que reagem à música, no player.</p>
+          <select id="viz-mode" class="select">
+            <option value="bars">Barras</option>
+            <option value="wave">Onda</option>
+            <option value="off">Desligada</option>
+          </select>
+        </div>
+        <div class="ai-card">
+          <h3>Teclas de mídia</h3>
+          <p>Controlar a música pelo teclado mesmo com o app minimizado
+             ou em outra janela.</p>
+          <label class="switch">
+            <input type="checkbox" id="hotkeys-toggle">
+            <span>Teclas globais</span>
+          </label>
+        </div>
+      </div>
 
       <div class="section-title" style="margin-top:28px">// Conta</div>
       <div class="ai-grid">
@@ -355,6 +414,8 @@
     </div>
   </div>
 
+  <div class="viz-wrap" id="viz-wrap"><canvas id="viz-canvas"></canvas></div>
+
   <div class="player-right">
     <span class="badge hidden" id="radio-badge">rádio</span>
     <span class="badge hidden" id="source-badge">offline</span>
@@ -394,5 +455,7 @@
 <script src="mascot.js"></script>
 <script src="app.js"></script>
 <script src="extras.js"></script>
+<script src="audio-fx.js"></script>
+<script src="stats-ui.js"></script>
 </body>
 </html>

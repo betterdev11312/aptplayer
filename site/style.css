@@ -392,3 +392,14 @@ a:hover { color: var(--yellow); }
 .dl-options { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
 .dl-meta strong { color: var(--text); }
 @media (max-width: 520px) { .dl-options { flex-direction: column; } }
+
+
+.dl-alt {
+  margin-top: 14px; font-family: var(--mono); font-size: 12px;
+  color: var(--text-faint);
+}
+.dl-alt a { color: var(--text-dim); }
+.dl-alt a:hover { color: var(--yellow); }
+.split-box code {
+  font-family: var(--mono); font-size: 12px; color: var(--cyan);
+}

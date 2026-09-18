@@ -107,10 +107,13 @@ function catBrain() {
   const idleFor = Date.now() - Cat.idleSince;
   const playing = typeof audio !== "undefined" && !audio.paused && audio.src;
 
-  // dança enquanto toca música
-  if (playing && Cat.state !== "dance" && Math.random() < 0.35) {
-    catSetState("dance");
-    return;
+  // dança enquanto toca música; com a visualização ligada, reage ao volume
+  if (playing && Cat.state !== "dance") {
+    const level = typeof fxLevel === "function" ? fxLevel() : 0;
+    if (level > 0.18 || Math.random() < 0.35) {
+      catSetState("dance");
+      return;
+    }
   }
   if (!playing && Cat.state === "dance") {
     catSetState("idle");

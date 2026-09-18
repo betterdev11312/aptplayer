@@ -39,8 +39,9 @@ exe = EXE(
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
-    upx=True,
+    upx=False,   # UPX dispara falso positivo em antivirus
     runtime_tmpdir=None,
     console=False,          # sem janela preta de terminal
     icon="icon/app.ico",
+    version="version_info.txt",
 )

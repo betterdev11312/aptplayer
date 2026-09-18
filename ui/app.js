@@ -108,6 +108,7 @@ function showView(name) {
   if (name === "ai") refreshAiStatus();
   if (name === "chat") initChat();
   if (name === "settings") initSettings();
+  if (name === "stats") loadStats();
 }
 
 document.querySelectorAll(".nav-item").forEach((btn) =>
@@ -835,6 +836,8 @@ function boot() {
   refreshCacheInfo();
   loadHome();
   setupMediaKeys();
+  initAudioFx();
+  restoreHotkeys();
   catInit();
 }
 
@@ -982,6 +985,7 @@ function initSettings() {
   renderThemes();
   loadAbout();
   loadAccount();
+  initAudioSettings();
   const toggle = $("cat-toggle");
   if (toggle) {
     try { toggle.checked = localStorage.getItem("aptplayer-cat") !== "off"; }
@@ -1497,4 +1501,18 @@ $("import-backup")?.addEventListener("click", async () => {
   if (!r.ok) return toast(r.error, true);
   toast(`${r.tracks} faixas e ${r.playlists} playlists importadas`);
   loadPlaylists(); loadHome(true);
+});
+
+
+/* mostra e esconde a caixa de importação do Spotify */
+$("open-spotify")?.addEventListener("click", () => {
+  const box = $("spotify-box");
+  box.classList.toggle("hidden");
+  if (!box.classList.contains("hidden")) $("spotify-url").focus();
+});
+$("close-spotify")?.addEventListener("click", () => {
+  $("spotify-box").classList.add("hidden");
+});
+$("spotify-url")?.addEventListener("keydown", (ev) => {
+  if (ev.key === "Enter") $("spotify-btn").click();
 });

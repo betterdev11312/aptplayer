@@ -26,7 +26,8 @@ exe = EXE(
     name="AptPlayer-Setup",
     debug=False,
     strip=False,
-    upx=True,
+    upx=False,   # UPX dispara falso positivo em antivirus
     console=False,
     icon="icon/app.ico",
+    version="version_info.txt",
 )

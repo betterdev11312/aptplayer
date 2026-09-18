@@ -6,8 +6,8 @@ window.pywebview.api.<nome>(...).
 
 from pathlib import Path
 
-from . import (account, ai, cache, discover, library, lyrics, radio,
-               spotify, updater, youtube)
+from . import (account, ai, cache, discover, hotkeys, library, lyrics,
+               radio, spotify, stats, updater, youtube)
 from .paths import COVERS_DIR
 
 
@@ -591,3 +591,58 @@ class Api:
         except (OSError, ValueError) as exc:
             return {"ok": False, "error": f"Arquivo ilegivel: {exc}"}
         return library.import_snapshot(snapshot, replace=bool(replace))
+
+    # --- estatisticas -----------------------------------------------------
+
+    def get_stats(self, days: int = 0) -> dict:
+        """Retrospectiva: days=0 e desde sempre, 7/30/365 recortam o periodo."""
+        try:
+            data = stats.summary(int(days or 0))
+            data["by_hour"] = stats.by_hour(30)
+            data["by_day"] = stats.by_day(30)
+            data["streak"] = stats.streak()
+            data["first"] = stats.first_play()
+            return {"ok": True, **data}
+        except Exception as exc:
+            return {"ok": False, "error": str(exc)}
+
+    # --- teclas de midia globais ------------------------------------------
+
+    def hotkeys_start(self) -> dict:
+        """Liga as teclas de midia do teclado, mesmo com o app minimizado."""
+        def on_key(action):
+            window = self._window()
+            if not window:
+                return
+            js = {
+                "playpause": "document.getElementById('btn-play').click()",
+                "next": "playNext(false)",
+                "prev": "playPrev()",
+                "stop": "audio.pause(); audio.currentTime = 0",
+            }.get(action)
+            if js:
+                try:
+                    window.evaluate_js(js)
+                except Exception:
+                    pass
+
+        ok = hotkeys.start(on_key)
+        return {"ok": True, "active": ok}
+
+    def hotkeys_stop(self) -> dict:
+        hotkeys.stop()
+        return {"ok": True, "active": False}
+
+    def hotkeys_status(self) -> dict:
+        return {"ok": True, "active": hotkeys.is_active()}
+
+    @staticmethod
+    def _window():
+        import webview
+        return webview.windows[0] if webview.windows else None
+
+    def minimize(self) -> dict:
+        window = self._window()
+        if window:
+            window.minimize()
+        return {"ok": True}

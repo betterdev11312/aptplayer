@@ -30,6 +30,7 @@
     <a href="#recursos">Recursos</a>
     <a href="#telas">Telas</a>
     <a href="#ia">IA</a>
+    <a href="#avisos">Ao baixar</a>
     <a href="#changelog">Novidades</a>
     <a class="nav-cta" href="AptPlayer.exe" download>Baixar</a>
   </div>
@@ -39,7 +40,7 @@
 <header class="hero" id="top">
   <div class="hero-inner">
     <div class="hero-text">
-      <div class="kicker">// v1.2 · Windows · instalador ou portátil</div>
+      <div class="kicker">// v1.3 · Windows · instalador ou portátil</div>
       <h1>Seu player.<br><span class="hl">Sua máquina.</span><br>Sem conta nenhuma.</h1>
       <p class="lead">
         Busca no YouTube, monta sua biblioteca, baixa o que você mais ouve e
@@ -238,22 +239,64 @@
     <h2>Pegue o seu</h2>
     <p>Arquivo único. Baixou, clicou, funciona.</p>
     <div class="dl-options">
-      <a class="btn primary big" href="AptPlayer-Setup.exe" download>
+      <a class="btn primary big" href="AptPlayer-Setup.zip" download>
         <svg viewBox="0 0 24 24"><path d="M12 3v12m0 0 4.5-4.5M12 15l-4.5-4.5M4 19h16"/></svg>
-        Instalador — 44 MB
+        Instalador — 43 MB
       </a>
-      <a class="btn ghost big" href="AptPlayer.exe" download>
+      <a class="btn ghost big" href="AptPlayer.zip" download>
         Portátil — 25 MB
       </a>
+    </div>
+    <div class="dl-alt">
+      ou baixe o .exe direto:
+      <a href="AptPlayer-Setup.exe" download>instalador</a> ·
+      <a href="AptPlayer.exe" download>portátil</a>
     </div>
     <div class="dl-meta">
       <strong>Instalador</strong>: cria atalhos e aparece em Aplicativos Instalados.<br>
       <strong>Portátil</strong>: arquivo único, roda de onde estiver.<br><br>
-      Windows 10/11 · 64-bit<br>
-      <span class="dim">
-        O Windows pode avisar que o app é desconhecido — é normal em programas
-        sem assinatura digital paga. Clique em <em>Mais informações → Executar assim mesmo</em>.
-      </span>
+      Windows 10/11 · 64-bit
+    </div>
+  </div>
+</section>
+
+<!-- ===== AVISOS ===== -->
+<section class="section" id="avisos">
+  <div class="section-head">
+    <div class="kicker">// Ao baixar</div>
+    <h2>O navegador vai reclamar</h2>
+  </div>
+
+  <div class="split">
+    <div class="split-text">
+      <p>
+        O Chrome e o Windows avisam que o arquivo é suspeito. <strong>É falso
+        positivo</strong>, e acontece com praticamente todo programa pequeno
+        feito em Python.
+      </p>
+      <ul class="feature-list">
+        <li><strong>Sem assinatura digital</strong> — um certificado custa cerca de US$ 200 por ano</li>
+        <li><strong>Sem reputação</strong> — o Chrome confia em arquivos já baixados por milhares de pessoas</li>
+        <li><strong>Empacotado com PyInstaller</strong> — o executável se auto-extrai ao rodar, padrão que alguns malwares também usam</li>
+      </ul>
+      <p class="note">
+        O código é aberto: dá para ler tudo e compilar você mesmo, se preferir
+        não confiar no binário.
+      </p>
+    </div>
+
+    <div class="split-box">
+      <div class="box-title">Como prosseguir</div>
+      <ol class="steps">
+        <li><strong>No Chrome</strong>: clique na seta ao lado do aviso →
+            <em>Manter</em></li>
+        <li><strong>No Windows</strong>: ao abrir, clique em
+            <em>Mais informações</em> → <em>Executar assim mesmo</em></li>
+      </ol>
+      <p class="box-note">
+        Os arquivos <code>.zip</code> costumam gerar menos alerta que o
+        <code>.exe</code> direto.
+      </p>
     </div>
   </div>
 </section>
@@ -271,9 +314,29 @@
       <div class="entry-mark"></div>
       <div class="entry-body">
         <div class="entry-head">
+          <span class="version">v1.3</span>
+          <span class="date">18 set 2026</span>
+          <span class="badge-new">atual</span>
+        </div>
+        <h3>Som, números e controle</h3>
+        <ul>
+          <li><strong>Equalizer</strong> — 7 bandas (60Hz a 14kHz) e presets: Grave, Vocal, Agudo, Rock, Eletrônica e Podcast.</li>
+          <li><strong>Visualização de áudio</strong> — barras ou onda reagindo à música, nas cores do tema. O Byte dança no ritmo real da faixa.</li>
+          <li><strong>Retrospectiva</strong> — seus artistas e músicas mais ouvidos, tempo total, sequência de dias e a que horas você ouve. Tudo calculado na sua máquina.</li>
+          <li><strong>Teclas de mídia globais</strong> — play, pausa e faixa anterior/próxima funcionam com o app minimizado.</li>
+          <li><strong>Importar do Spotify</strong> — agora fica na Biblioteca, onde se procura por isso.</li>
+          <li><strong>Conta na nuvem</strong> — login opcional para recuperar playlists ao trocar de PC, com backup em arquivo como alternativa.</li>
+          <li>Download em <code>.zip</code> e metadados no executável, para reduzir o falso positivo dos antivírus.</li>
+        </ul>
+      </div>
+    </article>
+
+    <article class="entry">
+      <div class="entry-mark"></div>
+      <div class="entry-body">
+        <div class="entry-head">
           <span class="version">v1.2</span>
           <span class="date">17 set 2026</span>
-          <span class="badge-new">atual</span>
         </div>
         <h3>Byte, o mascote — e muito mais</h3>
         <ul>
