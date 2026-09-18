@@ -26,10 +26,16 @@ Em um ou dois minutos o site fica no ar em:
      conteúdo de [RELEASE-NOTES.md](RELEASE-NOTES.md) — já está pronto.
      (Esse campo é opcional; sem ele o release funciona igual.)
 3. Arraste os quatro arquivos da pasta `site/` para a área de anexos:
-   - `AptPlayer-Setup.exe`
-   - `AptPlayer-Setup.zip`
-   - `AptPlayer.exe`
-   - `AptPlayer.zip`
+
+   | Arquivo | Tamanho | Para quem |
+   |---|---|---|
+   | `AptPlayer-Setup.exe` | 37 MB | a maioria — é o botão grande do site |
+   | `AptPlayer.exe` | 22 MB | quem prefere portátil |
+   | `AptPlayer-Setup.zip` | 37 MB | se o navegador bloquear o .exe |
+   | `AptPlayer.zip` | 22 MB | portátil, mesma situação |
+
+   Os `.zip` não são menores (o executável já vem compactado por dentro) —
+   servem só para contornar o alerta do navegador.
 4. **Publish release**
 
 Pronto — os botões de download do site já apontam para esses arquivos.
