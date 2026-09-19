@@ -14,6 +14,10 @@ const room = {
   pollSync: 0,
   listenTogether: false,
   applyingRemote: false,   // evita eco: mudança vinda da sala não volta pra sala
+  startTimer: 0,           // play agendado
+  countTimer: 0,           // contagem regressiva
+  scheduledFor: null,      // horário já agendado, para não repetir
+  lastPushed: null,        // última faixa anunciada à sala
 };
 
 /* ===== Lista de salas ===== */
@@ -82,6 +86,11 @@ function closeRoom() {
   clearInterval(room.pollMsg);
   clearInterval(room.pollMembers);
   clearInterval(room.pollSync);
+  clearTimeout(room.startTimer);
+  clearTimeout(room.countTimer);
+  hideCountdown();
+  room.scheduledFor = null;
+  room.lastPushed = null;
   room.pollMsg = room.pollMembers = room.pollSync = 0;
   room.listenTogether = false;
   $("listen-together")?.classList.remove("on");
@@ -230,12 +239,97 @@ async function toggleListenTogether() {
 
   toast("ouvir junto ligado — a sala toca a mesma música");
 
-  // quem liga com música tocando define o que todos vão ouvir
+  // quem liga com música tocando agenda o início para todos
   const track = state.queue[state.index];
-  if (track && !audio.paused) await pushPlayback();
+  if (track) await startTogether(track, audio.currentTime || 0);
 
-  room.pollSync = setInterval(syncPlayback, 4000);
+  room.pollSync = setInterval(syncPlayback, 3000);
   syncPlayback();
+}
+
+/* Quantos segundos de antecedência o início é agendado. Precisa dar tempo
+   de todo mundo receber o aviso e carregar o áudio. */
+const SYNC_DELAY = 5;
+
+/** Agenda o início da faixa para daqui a alguns segundos, para todos. */
+async function startTogether(track, position = 0) {
+  if (!room.id) return;
+
+  audio.pause();
+  showCountdown(SYNC_DELAY);
+
+  await api().room_set_playback(room.id, {
+    video_id: track.video_id, title: track.title,
+    artist: track.artist, thumbnail: track.thumbnail,
+  }, position, true, SYNC_DELAY);
+
+  // quem agendou também espera: todos começam juntos
+  scheduleLocalStart(track, position, SYNC_DELAY);
+}
+
+/** Carrega o áudio agora e dá play no instante combinado. */
+async function scheduleLocalStart(track, position, secondsLeft) {
+  room.applyingRemote = true;
+
+  const current = state.queue[state.index];
+  if (!current || current.video_id !== track.video_id) {
+    await playTrack(track, [track]);
+  }
+  audio.pause();                       // carregado, mas parado
+
+  // espera o áudio ter dados suficientes antes de posicionar
+  await waitReady();
+  try { audio.currentTime = position; } catch {}
+
+  const waitMs = Math.max(0, secondsLeft * 1000 - 120);
+  clearTimeout(room.startTimer);
+  room.startTimer = setTimeout(() => {
+    audio.play().catch(() => {});
+    hideCountdown();
+    setTimeout(() => { room.applyingRemote = false; }, 800);
+  }, waitMs);
+}
+
+/** Espera o elemento de áudio ter dados (readyState 3+), com teto de 4s. */
+function waitReady(timeout = 4000) {
+  return new Promise((resolve) => {
+    if (audio.readyState >= 3) return resolve();
+    const done = () => { cleanup(); resolve(); };
+    const cleanup = () => {
+      audio.removeEventListener("canplay", done);
+      clearTimeout(timer);
+    };
+    const timer = setTimeout(done, timeout);
+    audio.addEventListener("canplay", done, { once: true });
+  });
+}
+
+/* ===== Contagem regressiva na tela ===== */
+
+function showCountdown(seconds) {
+  let el = $("sync-countdown");
+  if (!el) {
+    el = document.createElement("div");
+    el.id = "sync-countdown";
+    el.className = "sync-countdown";
+    document.body.appendChild(el);
+  }
+  el.classList.add("show");
+
+  const tick = (left) => {
+    el.innerHTML =
+      `<div class="sync-num">${left}</div>` +
+      `<div class="sync-label">todos começam juntos</div>`;
+    if (left > 0) room.countTimer = setTimeout(() => tick(left - 1), 1000);
+    else hideCountdown();
+  };
+  clearTimeout(room.countTimer);
+  tick(Math.ceil(seconds));
+}
+
+function hideCountdown() {
+  clearTimeout(room.countTimer);
+  $("sync-countdown")?.classList.remove("show");
 }
 
 async function pushPlayback() {
@@ -243,10 +337,16 @@ async function pushPlayback() {
   const track = state.queue[state.index];
   if (!track) return;
 
+  // Troca de faixa vira um novo agendamento, para todos pularem juntos.
+  if (track.video_id !== room.lastPushed) {
+    room.lastPushed = track.video_id;
+    return startTogether(track, 0);
+  }
+
   await api().room_set_playback(room.id, {
     video_id: track.video_id, title: track.title,
     artist: track.artist, thumbnail: track.thumbnail,
-  }, audio.currentTime || 0, !audio.paused);
+  }, audio.currentTime || 0, !audio.paused, 0);
 }
 
 async function syncPlayback() {
@@ -256,8 +356,20 @@ async function syncPlayback() {
   if (!res.ok || !res.playback) return;
 
   const p = res.playback;
-  if (p.mine) return;                       // fui eu que mandei
   if (!p.track || !p.track.video_id) return;
+
+  // Início agendado que ainda não chegou: prepara e espera.
+  if (typeof p.starts_in === "number" && p.starts_in > 0.3) {
+    if (room.scheduledFor !== p.start_at) {
+      room.scheduledFor = p.start_at;
+      showCountdown(p.starts_in);
+      scheduleLocalStart(p.track, p.start_position || 0, p.starts_in);
+    }
+    return;
+  }
+
+  if (p.mine) return;                  // daqui pra baixo, só o que veio de fora
+  if (room.applyingRemote) return;     // já estou aplicando um agendamento
 
   const current = state.queue[state.index];
   const sameTrack = current && current.video_id === p.track.video_id;
@@ -265,23 +377,24 @@ async function syncPlayback() {
   room.applyingRemote = true;
   try {
     if (!sameTrack) {
+      // entrou no meio: começa já no ponto certo
       await playTrack(p.track, [p.track]);
-      // espera o áudio existir antes de posicionar
-      setTimeout(() => {
-        if (audio.duration) audio.currentTime = Math.min(p.position, audio.duration - 1);
-      }, 900);
+      await waitReady();
+      if (audio.duration) {
+        audio.currentTime = Math.min(p.position, audio.duration - 1);
+      }
       toast(`tocando junto: ${p.track.title}`);
     } else {
-      // já é a mesma faixa: corrige só se estiver longe
+      // mesma faixa: corrige só se o desvio for audível
       const drift = Math.abs((audio.currentTime || 0) - p.position);
-      if (drift > 3 && audio.duration) {
+      if (drift > 1.5 && audio.duration) {
         audio.currentTime = Math.min(p.position, audio.duration - 1);
       }
       if (p.playing && audio.paused) audio.play().catch(() => {});
       if (!p.playing && !audio.paused) audio.pause();
     }
   } finally {
-    setTimeout(() => { room.applyingRemote = false; }, 1200);
+    setTimeout(() => { room.applyingRemote = false; }, 900);
   }
 }
 

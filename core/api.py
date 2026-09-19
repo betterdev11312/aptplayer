@@ -761,8 +761,14 @@ class Api:
         return rooms.history(room_id, int(after_id or 0))
 
     def room_set_playback(self, room_id: str, track: dict, position: float,
-                          playing: bool) -> dict:
-        return rooms.set_playback(room_id, track, position, playing)
+                          playing: bool, start_in: float = 0) -> dict:
+        return rooms.set_playback(room_id, track, position, playing,
+                                  float(start_in or 0))
+
+    def room_clock(self) -> dict:
+        """Hora do servidor e desvio do relogio local."""
+        return {"ok": True, "server_now": rooms.server_now(),
+                "offset": rooms.clock_offset()}
 
     def room_get_playback(self, room_id: str) -> dict:
         return rooms.get_playback(room_id)
@@ -824,3 +830,95 @@ class Api:
         if window:
             window.destroy()
         return {"ok": True}
+
+    def window_move(self, dx: int, dy: int) -> dict:
+        """Move a janela. Chamado enquanto se arrasta a barra de titulo."""
+        import ctypes
+        import ctypes.wintypes as wintypes
+
+        handle = self._handle()
+        if not handle:
+            return {"ok": False}
+        rect = wintypes.RECT()
+        ctypes.windll.user32.GetWindowRect(handle, ctypes.byref(rect))
+        ctypes.windll.user32.SetWindowPos(
+            handle, 0, rect.left + int(dx), rect.top + int(dy), 0, 0,
+            0x0001 | 0x0004,          # SWP_NOSIZE | SWP_NOZORDER
+        )
+        return {"ok": True}
+
+    def window_resize(self, edge: str, dx: int, dy: int) -> dict:
+        """Redimensiona pela borda indicada (n, s, e, w, ne, nw, se, sw)."""
+        import ctypes
+        import ctypes.wintypes as wintypes
+
+        handle = self._handle()
+        if not handle:
+            return {"ok": False}
+
+        rect = wintypes.RECT()
+        ctypes.windll.user32.GetWindowRect(handle, ctypes.byref(rect))
+        left, top, right, bottom = rect.left, rect.top, rect.right, rect.bottom
+
+        if "w" in edge:
+            left += int(dx)
+        if "e" in edge:
+            right += int(dx)
+        if "n" in edge:
+            top += int(dy)
+        if "s" in edge:
+            bottom += int(dy)
+
+        # respeita o tamanho minimo da janela
+        if right - left < 940:
+            if "w" in edge:
+                left = right - 940
+            else:
+                right = left + 940
+        if bottom - top < 620:
+            if "n" in edge:
+                top = bottom - 620
+            else:
+                bottom = top + 620
+
+        ctypes.windll.user32.SetWindowPos(
+            handle, 0, left, top, right - left, bottom - top, 0x0004,
+        )
+        return {"ok": True}
+
+    def window_fullscreen(self) -> dict:
+        """Alterna tela cheia."""
+        window = self._window()
+        if not window:
+            return {"ok": False}
+        try:
+            window.toggle_fullscreen()
+            self._fullscreen = not getattr(self, "_fullscreen", False)
+            return {"ok": True, "fullscreen": self._fullscreen}
+        except Exception as exc:
+            return {"ok": False, "error": str(exc)}
+
+    @staticmethod
+    def _handle():
+        """Handle nativo da janela, para as chamadas do Windows."""
+        import ctypes
+
+        user32 = ctypes.windll.user32
+        found = []
+
+        def callback(handle, _):
+            if not user32.IsWindowVisible(handle):
+                return True
+            length = user32.GetWindowTextLengthW(handle)
+            if not length:
+                return True
+            buffer = ctypes.create_unicode_buffer(length + 1)
+            user32.GetWindowTextW(handle, buffer, length + 1)
+            if buffer.value.strip() == "AptPlayer":
+                found.append(handle)
+            return True
+
+        proto = ctypes.WINFUNCTYPE(ctypes.c_bool, ctypes.c_void_p,
+                                   ctypes.c_void_p)
+        user32.EnumWindows(proto(callback), 0)
+        return found[0] if found else None

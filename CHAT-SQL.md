@@ -112,3 +112,17 @@ delete from messages where created_at < now() - interval '30 days';
    e pode ligar o **ouvir junto**
 
 Só quem tem o código entra. Ninguém descobre salas dos outros.
+
+---
+
+## Atualização para o início sincronizado (v1.8)
+
+Rode também este SQL, que adiciona as colunas do início agendado:
+
+```sql
+alter table room_playback
+  add column if not exists start_at timestamptz,
+  add column if not exists start_position double precision not null default 0;
+```
+
+Sem isso a sala continua funcionando, só sem o início no mesmo segundo.

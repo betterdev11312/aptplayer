@@ -856,30 +856,53 @@ function boot() {
   audio.volume = 0.8;
   $("volume-fill").style.width = "80%";
   // Cada passo e isolado: se um falhar, os outros continuam.
+  //
+  // Os nomes vao como STRING de proposito: citar a funcao direto aqui faria
+  // o array quebrar caso o arquivo dela ainda nao tivesse carregado - e com
+  // ele todos os passos seguintes, deixando a interface pela metade.
   const steps = [
-    ["fila", renderQueue],
-    ["playlists", loadPlaylists],
-    ["cache", refreshCacheInfo],
-    ["idioma", initLanguage],
-    ["teclas", setupMediaKeys],
-    ["audio", initAudioFx],
-    ["transicao", fadeInit],
-    ["home", loadHome],
-    ["idiomas de letra", fillLanguageSelects],
-    ["teclas globais", restoreHotkeys],
-    ["mascote", catInit],
+    "renderQueue", "loadPlaylists", "refreshCacheInfo", "initLanguage",
+    "setupMediaKeys", "initAudioFx", "fadeInit", "loadHome",
+    "fillLanguageSelects", "restoreHotkeys", "catInit",
   ];
-  steps.forEach(([nome, fn]) => {
+  steps.forEach((nome) => {
     try {
-      fn();
+      const fn = window[nome] || eval(nome);
+      if (typeof fn === "function") fn();
+      else console.warn("nao carregou:", nome);
     } catch (err) {
       console.error("falha ao iniciar:", nome, err);
     }
   });
 }
 
-window.addEventListener("pywebviewready", boot);
-setTimeout(() => { if (api()) boot(); }, 1400);
+/* O boot precisa de DUAS coisas: a ponte com o Python (pywebviewready) e
+   todos os scripts carregados (load). Rodar antes disso deixa funcoes como
+   catInit e loadRooms indefinidas, e a interface aparece pela metade. */
+let bridgeReady = false;
+let scriptsReady = document.readyState === "complete";
+
+function bootWhenReady() {
+  if (bridgeReady && scriptsReady) boot();
+}
+
+window.addEventListener("pywebviewready", () => {
+  bridgeReady = true;
+  bootWhenReady();
+});
+
+window.addEventListener("load", () => {
+  scriptsReady = true;
+  bootWhenReady();
+});
+
+// rede de seguranca: se algum dos eventos nao vier, tenta mesmo assim
+setTimeout(() => {
+  if (!state.ready && api()) {
+    bridgeReady = scriptsReady = true;
+    boot();
+  }
+}, 2500);
 
 /* ===== Temas ===== */
 
@@ -1784,3 +1807,87 @@ function updateTitlebar(track) {
   if (!el) return;
   el.textContent = track ? `${track.artist} - ${track.title}` : "";
 }
+
+
+/* ===== Arrastar e redimensionar a janela sem moldura ===== */
+
+/** Arrastar pela barra de titulo. */
+(() => {
+  const bar = document.querySelector(".tb-drag");
+  if (!bar) return;
+
+  let dragging = false;
+  let lastX = 0;
+  let lastY = 0;
+
+  bar.addEventListener("mousedown", (ev) => {
+    if (ev.button !== 0) return;
+    dragging = true;
+    lastX = ev.screenX;
+    lastY = ev.screenY;
+    ev.preventDefault();
+  });
+
+  window.addEventListener("mousemove", (ev) => {
+    if (!dragging) return;
+    const dx = ev.screenX - lastX;
+    const dy = ev.screenY - lastY;
+    if (dx || dy) {
+      lastX = ev.screenX;
+      lastY = ev.screenY;
+      api().window_move(dx, dy);
+    }
+  });
+
+  window.addEventListener("mouseup", () => { dragging = false; });
+})();
+
+/** Redimensionar pelas bordas invisiveis. */
+document.querySelectorAll(".rz").forEach((edge) => {
+  let resizing = false;
+  let lastX = 0;
+  let lastY = 0;
+
+  edge.addEventListener("mousedown", (ev) => {
+    if (ev.button !== 0) return;
+    resizing = true;
+    lastX = ev.screenX;
+    lastY = ev.screenY;
+    ev.preventDefault();
+    ev.stopPropagation();
+  });
+
+  window.addEventListener("mousemove", (ev) => {
+    if (!resizing) return;
+    const dx = ev.screenX - lastX;
+    const dy = ev.screenY - lastY;
+    if (dx || dy) {
+      lastX = ev.screenX;
+      lastY = ev.screenY;
+      api().window_resize(edge.dataset.edge, dx, dy);
+    }
+  });
+
+  window.addEventListener("mouseup", () => { resizing = false; });
+});
+
+/** Tela cheia. */
+async function toggleFullscreen() {
+  const res = await api().window_fullscreen();
+  if (res.ok) {
+    document.body.classList.toggle("fullscreen", !!res.fullscreen);
+    toast(res.fullscreen ? "tela cheia — F11 para sair" : "saindo da tela cheia");
+  }
+}
+
+$("tb-full")?.addEventListener("click", toggleFullscreen);
+
+document.addEventListener("keydown", (ev) => {
+  if (ev.code === "F11") {
+    ev.preventDefault();
+    toggleFullscreen();
+  }
+  if (ev.code === "Escape" && document.body.classList.contains("fullscreen")) {
+    toggleFullscreen();
+  }
+});

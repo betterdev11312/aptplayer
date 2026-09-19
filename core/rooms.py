@@ -22,6 +22,10 @@ from . import account
 TIMEOUT = 15
 _ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"   # sem I, O, 0, 1
 
+# Diferenca entre o relogio desta maquina e o do servidor, em segundos.
+# Sem isso, PCs com horarios diferentes comecariam a musica fora de sincronia.
+_clock_offset = 0.0
+
 
 def _headers() -> dict:
     headers = {
@@ -58,6 +62,8 @@ def _rest(method: str, table: str, params: dict | None = None,
     if response.status_code == 401 and retry and account.refresh():
         return _rest(method, table, params, payload, prefer, retry=False)
 
+    _learn_clock(response)
+
     if response.status_code >= 400:
         detail = response.text[:160]
         if "PGRST205" in detail or "does not exist" in detail:
@@ -69,6 +75,31 @@ def _rest(method: str, table: str, params: dict | None = None,
         return response.json(), None
     except ValueError:
         return [], None
+
+
+def _learn_clock(response) -> None:
+    """Le a hora do servidor no cabecalho Date e guarda a diferenca."""
+    global _clock_offset
+    header = response.headers.get("Date")
+    if not header:
+        return
+    try:
+        from email.utils import parsedate_to_datetime
+        server = parsedate_to_datetime(header).timestamp()
+    except (TypeError, ValueError):
+        return
+    # metade do tempo de ida e volta compensa a latencia da resposta
+    latency = response.elapsed.total_seconds() / 2 if response.elapsed else 0
+    _clock_offset = (server + latency) - time.time()
+
+
+def server_now() -> float:
+    """Hora do servidor, estimada a partir do relogio local."""
+    return time.time() + _clock_offset
+
+
+def clock_offset() -> float:
+    return _clock_offset
 
 
 def _new_code() -> str:
@@ -260,24 +291,53 @@ def history(room_id: str, after_id: int = 0, limit: int = 60) -> dict:
 # ---------------------------------------------------------------- ouvir junto
 
 def set_playback(room_id: str, track: dict | None, position: float,
-                 playing: bool) -> dict:
+                 playing: bool, start_in: float = 0) -> dict:
+    """Atualiza o que a sala esta tocando.
+
+    start_in > 0 agenda o inicio para daqui a tantos segundos - e assim que
+    todos comecam no mesmo instante, em vez de cada um na hora que recebe.
+    """
     user = account.current_user()
     if not user:
         return {"ok": False, "error": "Sem sessao."}
 
-    _, error = _rest("POST", "room_playback", payload={
+    payload = {
         "room_id": room_id, "track": track,
         "position": float(position or 0), "playing": bool(playing),
         "updated_by": user["id"], "updated_at": "now()",
-    }, prefer="resolution=merge-duplicates,return=minimal")
+    }
+
+    if start_in > 0:
+        from datetime import datetime, timezone
+        moment = datetime.fromtimestamp(server_now() + start_in, tz=timezone.utc)
+        payload["start_at"] = moment.isoformat()
+        payload["start_position"] = float(position or 0)
+
+    _, error = _rest("POST", "room_playback", payload=payload,
+                     prefer="resolution=merge-duplicates,return=minimal")
+
+    # Bancos sem as colunas novas continuam funcionando, so sem agendamento.
+    if error and "start_at" in str(error):
+        payload.pop("start_at", None)
+        payload.pop("start_position", None)
+        _, error = _rest("POST", "room_playback", payload=payload,
+                         prefer="resolution=merge-duplicates,return=minimal")
+
     return {"ok": not error, "error": error or ""}
 
 
 def get_playback(room_id: str) -> dict:
+    select = "track,position,playing,updated_by,updated_at,start_at,start_position"
     rows, error = _rest("GET", "room_playback", params={
-        "room_id": f"eq.{room_id}",
-        "select": "track,position,playing,updated_by,updated_at", "limit": 1,
+        "room_id": f"eq.{room_id}", "select": select, "limit": 1,
     })
+    # banco antigo, sem as colunas de agendamento
+    if error and "start_at" in str(error):
+        rows, error = _rest("GET", "room_playback", params={
+            "room_id": f"eq.{room_id}",
+            "select": "track,position,playing,updated_by,updated_at", "limit": 1,
+        })
+
     if error:
         return {"ok": False, "error": error}
     if not rows:
@@ -286,15 +346,31 @@ def get_playback(room_id: str) -> dict:
     row = rows[0]
     user = account.current_user() or {}
     row["mine"] = row.get("updated_by") == user.get("id")
+    row["server_now"] = server_now()
 
-    # compensa o tempo desde a ultima atualizacao, para todos ficarem juntos
-    if row.get("playing"):
+    from datetime import datetime, timezone
+
+    # Inicio agendado: quanto falta e em que ponto da musica comecar.
+    start_at = row.get("start_at")
+    if start_at:
         try:
-            from datetime import datetime, timezone
-            stamp = datetime.fromisoformat(
-                (row.get("updated_at") or "").replace("Z", "+00:00"))
-            elapsed = (datetime.now(timezone.utc) - stamp).total_seconds()
-            row["position"] = float(row.get("position") or 0) + max(0, elapsed)
+            moment = datetime.fromisoformat(str(start_at).replace("Z", "+00:00"))
+            row["starts_in"] = moment.timestamp() - server_now()
+            row["start_position"] = float(row.get("start_position") or 0)
+        except (ValueError, AttributeError):
+            row["starts_in"] = None
+    else:
+        row["starts_in"] = None
+
+    # Sem agendamento (ou ja passou): posicao corrigida pelo tempo decorrido.
+    if row.get("playing") and not (row.get("starts_in") or 0) > 0:
+        try:
+            base = start_at or row.get("updated_at") or ""
+            stamp = datetime.fromisoformat(str(base).replace("Z", "+00:00"))
+            elapsed = server_now() - stamp.timestamp()
+            origin = (row.get("start_position") if start_at
+                      else row.get("position")) or 0
+            row["position"] = float(origin) + max(0, elapsed)
         except (ValueError, AttributeError):
             pass
 

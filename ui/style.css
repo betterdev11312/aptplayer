@@ -1404,3 +1404,52 @@ body { padding-top: var(--tb-h); }
 .chat-wrap { height: calc(100vh - var(--player-h) - var(--tb-h) - 190px); }
 .rooms-layout { height: calc(100vh - var(--player-h) - var(--tb-h) - 190px); }
 .lyrics-panel { height: calc(100vh - var(--player-h) - var(--tb-h) - 40px); }
+
+
+/* ==================== CONTAGEM PARA COMECAR JUNTO ==================== */
+.sync-countdown {
+  position: fixed; inset: 0; z-index: 9000;
+  display: none; place-items: center;
+  background: rgba(3, 4, 7, .82); backdrop-filter: blur(3px);
+  pointer-events: none;
+}
+.sync-countdown.show { display: grid; }
+.sync-num {
+  font-family: var(--display, var(--font));
+  font-size: 110px; font-weight: 700; line-height: 1;
+  color: var(--yellow); text-shadow: 0 0 40px rgba(252,238,10,.6);
+  text-align: center;
+  animation: sync-pop .5s ease;
+}
+.sync-label {
+  font-family: var(--mono); font-size: 13px; color: var(--cyan);
+  letter-spacing: 3px; text-transform: uppercase; text-align: center;
+  margin-top: 14px;
+}
+@keyframes sync-pop {
+  from { transform: scale(1.4); opacity: .3; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+
+/* ==================== REDIMENSIONAR SEM MOLDURA ==================== */
+/* Faixas invisiveis nas bordas: sem elas a janela sem moldura nao
+   redimensiona, porque o Windows nao desenha as alcas nativas. */
+.resize-edges { position: fixed; inset: 0; z-index: 600; pointer-events: none; }
+.rz { position: absolute; pointer-events: auto; }
+.rz[data-edge="n"]  { top: 0; left: 6px; right: 6px; height: 4px; cursor: ns-resize; }
+.rz[data-edge="s"]  { bottom: 0; left: 6px; right: 6px; height: 4px; cursor: ns-resize; }
+.rz[data-edge="e"]  { right: 0; top: 6px; bottom: 6px; width: 4px; cursor: ew-resize; }
+.rz[data-edge="w"]  { left: 0; top: 6px; bottom: 6px; width: 4px; cursor: ew-resize; }
+.rz[data-edge="ne"] { top: 0; right: 0; width: 8px; height: 8px; cursor: nesw-resize; }
+.rz[data-edge="nw"] { top: 0; left: 0; width: 8px; height: 8px; cursor: nwse-resize; }
+.rz[data-edge="se"] { bottom: 0; right: 0; width: 8px; height: 8px; cursor: nwse-resize; }
+.rz[data-edge="sw"] { bottom: 0; left: 0; width: 8px; height: 8px; cursor: nesw-resize; }
+
+/* em tela cheia nao ha o que redimensionar */
+body.fullscreen .resize-edges { display: none; }
+body.fullscreen .titlebar { opacity: 0; transition: opacity .2s; }
+body.fullscreen .titlebar:hover { opacity: 1; }
+
+.tb-drag { cursor: grab; }
+.tb-drag:active { cursor: grabbing; }
