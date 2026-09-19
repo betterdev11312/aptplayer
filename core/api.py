@@ -357,11 +357,18 @@ class Api:
     # --- descobrir --------------------------------------------------------
 
     def discover_home(self, limit: int = 18) -> dict:
-        """Secoes da tela inicial."""
+        """Secoes da tela inicial (pessoais + descoberta)."""
         try:
             return {"ok": True, "sections": discover.home(int(limit))}
         except Exception as exc:
             return {"ok": False, "error": f"Falha ao montar a home: {exc}"}
+
+    def discover_local(self, limit: int = 18) -> dict:
+        """So o que vem do banco local - responde instantaneamente."""
+        try:
+            return {"ok": True, "sections": discover.local_sections(int(limit))}
+        except Exception as exc:
+            return {"ok": False, "error": str(exc), "sections": []}
 
     def discover_categories(self) -> dict:
         return {"ok": True, **discover.categories()}

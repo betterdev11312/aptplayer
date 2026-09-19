@@ -1,6 +1,6 @@
 {
-  "version": "1.7.1",
-  "url": "https://github.com/betterdev11312/aptplayer/releases/download/v1.7.1/AptPlayer-Setup.exe",
-  "exe": "https://github.com/betterdev11312/aptplayer/releases/download/v1.7.1/AptPlayer.exe",
-  "notes": "Barra de titulo no tema do app, Rich Presence no Discord e correcao do instalador."
+  "version": "1.7.2",
+  "url": "https://github.com/betterdev11312/aptplayer/releases/download/v1.7.2/AptPlayer-Setup.exe",
+  "exe": "https://github.com/betterdev11312/aptplayer/releases/download/v1.7.2/AptPlayer.exe",
+  "notes": "Barra de titulo no tema do app, Rich Presence no Discord, home que carrega em duas etapas e correcao do instalador."
 }

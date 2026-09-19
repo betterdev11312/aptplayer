@@ -855,17 +855,27 @@ function boot() {
   } catch { applyTheme("edgerunners"); }
   audio.volume = 0.8;
   $("volume-fill").style.width = "80%";
-  renderQueue();
-  loadPlaylists();
-  refreshCacheInfo();
-  loadHome();
-  setupMediaKeys();
-  initLanguage();
-  fillLanguageSelects();
-  initAudioFx();
-  fadeInit();
-  restoreHotkeys();
-  catInit();
+  // Cada passo e isolado: se um falhar, os outros continuam.
+  const steps = [
+    ["fila", renderQueue],
+    ["playlists", loadPlaylists],
+    ["cache", refreshCacheInfo],
+    ["idioma", initLanguage],
+    ["teclas", setupMediaKeys],
+    ["audio", initAudioFx],
+    ["transicao", fadeInit],
+    ["home", loadHome],
+    ["idiomas de letra", fillLanguageSelects],
+    ["teclas globais", restoreHotkeys],
+    ["mascote", catInit],
+  ];
+  steps.forEach(([nome, fn]) => {
+    try {
+      fn();
+    } catch (err) {
+      console.error("falha ao iniciar:", nome, err);
+    }
+  });
 }
 
 window.addEventListener("pywebviewready", boot);
@@ -1191,21 +1201,51 @@ async function loadHome(force = false) {
 
   $("home-greeting").innerHTML = greeting();
   const box = $("home-sections");
-  box.innerHTML = `<div class="loading">montando sua home...</div>`;
+  box.innerHTML = `<div class="loading">carregando...</div>`;
 
   loadChips();
 
-  const res = await api().discover_home(18);
-  if (!res.ok) {
-    box.innerHTML = `<div class="empty">${esc(res.error)}</div>`;
+  // Etapa 1: o que vem do banco local aparece na hora.
+  try {
+    const local = await api().discover_local(18);
+    if (local.ok && local.sections.length) {
+      box.innerHTML = "";
+      local.sections.forEach((section) => box.appendChild(renderRow(section)));
+      const marker = document.createElement("div");
+      marker.className = "loading";
+      marker.id = "home-more";
+      marker.textContent = "buscando sugestões...";
+      box.appendChild(marker);
+    }
+  } catch {
+    // segue para a etapa 2 de qualquer forma
+  }
+
+  // Etapa 2: descoberta, que depende da rede.
+  let res;
+  try {
+    res = await api().discover_home(18);
+  } catch (err) {
+    res = { ok: false, error: "não consegui carregar as sugestões" };
+  }
+
+  $("home-more")?.remove();
+
+  if (!res.ok || !res.sections?.length) {
+    // Sem rede a home nao fica vazia: o que e local continua na tela.
+    if (!box.querySelector(".row")) {
+      box.innerHTML =
+        `<div class="empty">${esc(res.error || "nada para mostrar ainda")}</div>` +
+        `<div style="text-align:center;margin-top:14px">` +
+          `<button class="btn" onclick="loadHome(true)">tentar de novo</button>` +
+        `</div>`;
+    }
     return;
   }
 
   box.innerHTML = "";
   res.sections.forEach((section) => box.appendChild(renderRow(section)));
-
-  const all = res.sections.flatMap((s) => s.tracks);
-  refreshDownloadMarks(all, box);
+  refreshDownloadMarks(res.sections.flatMap((s) => s.tracks), box);
 }
 
 async function loadChips() {

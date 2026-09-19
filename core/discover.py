@@ -162,6 +162,11 @@ def _suggestion_from_library(limit: int) -> dict | None:
     }
 
 
+def local_sections(limit: int = 18) -> list[dict]:
+    """Secoes que saem do banco local - sem rede, resposta imediata."""
+    return _personal_sections(limit)
+
+
 def home(limit: int = 18) -> list[dict]:
     """Monta a home: pessoal primeiro, depois descoberta.
 

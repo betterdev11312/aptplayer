@@ -20,7 +20,7 @@ from pathlib import Path
 import webview
 
 APP_NAME = "AptPlayer"
-APP_VERSION = "1.7.1"
+APP_VERSION = "1.7.2"
 PUBLISHER = "AptPlayer"
 EXE_NAME = "AptPlayer.exe"
 REG_KEY = rf"Software\Microsoft\Windows\CurrentVersion\Uninstall\{APP_NAME}"
