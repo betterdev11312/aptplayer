@@ -36,6 +36,31 @@ function fadeInit() {
   audio.addEventListener("timeupdate", fadeWatch);
 }
 
+/** Cancela uma transicao em andamento e silencia o elemento secundario.
+ *  Sem isto, pular faixa no meio do crossfade deixa duas musicas tocando. */
+function fadeCancel() {
+  clearInterval(fade.timer);
+  fade.timer = 0;
+  fade.fading = false;
+
+  const other = fade.other;
+  if (other) {
+    try {
+      other.pause();
+      other.removeAttribute("src");
+      other.load();          // descarrega de vez, nao so pausa
+      other.volume = 0;
+    } catch {}
+  }
+  if (audio) audio.volume = fade.baseVolume;
+}
+
+/** Para tudo o que estiver tocando, nos dois elementos. */
+function stopAll() {
+  fadeCancel();
+  try { audio.pause(); } catch {}
+}
+
 function fadeSave() {
   try {
     localStorage.setItem("aptplayer-fade", JSON.stringify({
@@ -51,6 +76,7 @@ function fadeSetBaseVolume(value) {
 
 function fadeWatch() {
   if (!fade.seconds || fade.fading || !audio.duration) return;
+  if (audio.paused) return;          // pausado nao inicia transicao
   if (state.repeat) return;                    // repetindo: não faz sentido
 
   const remaining = audio.duration - audio.currentTime;
@@ -66,9 +92,14 @@ async function startCrossfade(track) {
   if (fade.fading) return;
   fade.fading = true;
 
+  // Guarda de qual faixa esta transicao trata: se o usuario trocar de musica
+  // durante a busca do stream, a transicao perde a validade.
+  const origem = state.queue[state.index]?.video_id;
+
   const res = await api().resolve_stream(track.video_id);
-  if (!res.ok) {                               // sem stream: deixa o fluxo normal seguir
-    fade.fading = false;
+
+  if (!res.ok || state.queue[state.index]?.video_id !== origem) {
+    fadeCancel();
     return;
   }
 
@@ -91,6 +122,12 @@ async function startCrossfade(track) {
 
   clearInterval(fade.timer);
   fade.timer = setInterval(() => {
+    // a faixa mudou no meio da transicao: aborta em vez de sobrepor
+    if (!fade.fading || state.queue[state.index]?.video_id !== origem) {
+      fadeCancel();
+      return;
+    }
+
     i += 1;
     const ratio = i / steps;
     audio.volume = Math.max(0, from * (1 - ratio));
@@ -109,7 +146,8 @@ function swapPlayers(track) {
   const next = fade.other;
 
   old.pause();
-  old.src = "";
+  old.removeAttribute("src");
+  old.load();                // sem isto o antigo pode voltar a tocar
   old.volume = fade.baseVolume;
 
   // o elemento novo assume o lugar do antigo no DOM e nas variáveis

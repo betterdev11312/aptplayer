@@ -7,6 +7,7 @@ window.pywebview.api.<nome>(...).
 from pathlib import Path
 
 from . import (account, ai, autoupdate, cache, discord, discover, hotkeys,
+               notify, profile,
                library,
                lyrics, radio, rooms, share, spotify, stats, translate,
                updater, youtube)
@@ -922,3 +923,41 @@ class Api:
                                    ctypes.c_void_p)
         user32.EnumWindows(proto(callback), 0)
         return found[0] if found else None
+
+    # --- perfil -----------------------------------------------------------
+
+    def profile_get(self, user_id: str = "") -> dict:
+        return profile.get(user_id)
+
+    def profile_save(self, nickname: str = "", bio: str = "",
+                     avatar: str = None) -> dict:
+        return profile.save(nickname, bio, avatar)
+
+    def profile_many(self, user_ids: list) -> dict:
+        return profile.many(list(user_ids or []))
+
+    def profile_pick_avatar(self) -> dict:
+        """Abre o seletor de arquivo e prepara a foto."""
+        import webview
+
+        windows = webview.windows
+        if not windows:
+            return {"ok": False, "error": "Janela indisponivel."}
+
+        chosen = windows[0].create_file_dialog(
+            webview.OPEN_DIALOG, allow_multiple=False,
+            file_types=("Imagens (*.png;*.jpg;*.jpeg;*.webp;*.gif)",),
+        )
+        if not chosen:
+            return {"ok": False, "cancelled": True}
+        return profile.prepare_avatar(chosen[0])
+
+    # --- notificacoes -----------------------------------------------------
+
+    def notify(self, title: str, body: str = "") -> dict:
+        """Notificacao do Windows. Falha em silencio se nao der."""
+        try:
+            notify.show(title, body)
+        except Exception:
+            pass
+        return {"ok": True}

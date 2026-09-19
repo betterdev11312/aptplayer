@@ -457,6 +457,39 @@
         </div>
       </div>
 
+      <div class="section-title" style="margin-top:28px">// Perfil</div>
+      <div class="ai-grid">
+        <div class="ai-card">
+          <h3>Como os amigos te veem</h3>
+          <div class="profile-row">
+            <div class="profile-avatar" id="profile-avatar" title="Trocar foto">
+              <span id="profile-initial">?</span>
+            </div>
+            <div class="profile-fields">
+              <input id="profile-nick" type="text" maxlength="24"
+                     placeholder="seu nickname">
+              <textarea id="profile-bio" maxlength="200" rows="2"
+                        placeholder="uma bio curta (opcional)"></textarea>
+            </div>
+          </div>
+          <button class="btn primary" id="profile-save">Salvar perfil</button>
+          <div class="profile-hint" id="profile-hint"></div>
+        </div>
+
+        <div class="ai-card">
+          <h3>Notificações</h3>
+          <p>Aviso do Windows com som quando alguém falar com você numa sala.</p>
+          <label class="switch">
+            <input type="checkbox" id="notify-toggle" checked>
+            <span>Avisar sobre mensagens</span>
+          </label>
+          <label class="switch">
+            <input type="checkbox" id="notify-sound" checked>
+            <span>Tocar som</span>
+          </label>
+        </div>
+      </div>
+
       <div class="section-title" style="margin-top:28px">// Conta</div>
       <div class="ai-grid">
         <div class="ai-card" id="account-card">

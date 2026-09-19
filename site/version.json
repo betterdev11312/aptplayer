@@ -1,6 +1,6 @@
 {
-  "version": "1.8.0",
-  "url": "https://github.com/betterdev11312/aptplayer/releases/download/v1.8.0/AptPlayer-Setup.exe",
-  "exe": "https://github.com/betterdev11312/aptplayer/releases/download/v1.8.0/AptPlayer.exe",
-  "notes": "Inicio sincronizado no ouvir junto, barra de titulo completa e correcao da tela inicial vazia."
+  "version": "1.9.0",
+  "url": "https://github.com/betterdev11312/aptplayer/releases/download/v1.9.0/AptPlayer-Setup.exe",
+  "exe": "https://github.com/betterdev11312/aptplayer/releases/download/v1.9.0/AptPlayer.exe",
+  "notes": "Perfis com foto e bio, notificacoes de mensagem e correcao de duas musicas tocando juntas."
 }

@@ -119,6 +119,8 @@ async function refreshMessages(first = false) {
     if (first && !log.querySelector(".room-msg")) log.innerHTML = "";
     log.appendChild(messageBubble(m));
     room.lastId = Math.max(room.lastId, m.id);
+    // so avisa sobre o que chega depois de abrir a sala
+    if (!first) notifyMessage(m);
   });
 
   if (first || wasAtBottom) log.scrollTop = log.scrollHeight;
@@ -201,14 +203,33 @@ async function refreshMembers() {
   const online = res.members.filter((m) => m.online);
   $("room-online").textContent = `${online.length} online`;
 
+  // busca os perfis para mostrar foto e nickname escolhidos
+  const perfis = (await api().profile_many(res.members.map((m) => m.id)))
+    .profiles || {};
+
   res.members.forEach((m) => {
+    const perfil = perfis[m.id] || {};
+    const nome = perfil.nickname || m.nickname;
     const el = document.createElement("div");
     el.className = "room-member" + (m.online ? "" : " offline");
+
+    const foto = perfil.avatar
+      ? `<img src="${esc(perfil.avatar)}" alt="">`
+      : esc((nome || "?").charAt(0).toUpperCase());
+
     const playing = m.now_playing && m.now_playing.title
-      ? `<div class="member-playing">♪ ${esc(m.now_playing.title)} — ${esc(m.now_playing.artist || "")}</div>`
+      ? `<div class="member-playing">♪ ${esc(m.now_playing.title)}</div>`
       : `<div class="member-playing quiet">em silêncio</div>`;
+
     el.innerHTML =
-      `<div class="member-name">${esc(m.nickname)}</div>` + playing;
+      `<div class="member-row">` +
+        `<div class="member-avatar">${foto}</div>` +
+        `<div style="min-width:0;flex:1">` +
+          `<div class="member-name">${esc(nome)}</div>` +
+          playing +
+        `</div>` +
+      `</div>` +
+      (perfil.bio ? `<div class="member-playing quiet">${esc(perfil.bio)}</div>` : "");
     box.appendChild(el);
   });
 }
@@ -459,4 +480,144 @@ function initRooms() {
       toast("você saiu da sala");
     });
   });
+}
+
+/* ===== Perfil ===== */
+
+const profile = { data: null, avatar: null, cache: {} };
+
+async function loadProfile() {
+  const res = await api().profile_get();
+  const hint = $("profile-hint");
+
+  if (!res.ok) {
+    if (hint) hint.textContent = res.error;
+    return;
+  }
+
+  profile.data = res.profile;
+  const nick = $("profile-nick");
+  const bio = $("profile-bio");
+  if (nick) nick.value = res.profile.nickname || "";
+  if (bio) bio.value = res.profile.bio || "";
+
+  renderAvatar(res.profile.avatar, res.profile.nickname);
+  if (hint) {
+    hint.textContent = res.profile.new
+      ? "salve para criar seu perfil"
+      : "seu perfil aparece para os amigos nas salas";
+  }
+}
+
+function renderAvatar(dataUrl, nickname) {
+  const box = $("profile-avatar");
+  if (!box) return;
+  if (dataUrl) {
+    box.innerHTML = `<img src="${esc(dataUrl)}" alt="">`;
+  } else {
+    const letra = (nickname || "?").trim().charAt(0).toUpperCase() || "?";
+    box.innerHTML = `<span>${esc(letra)}</span>`;
+  }
+}
+
+$("profile-avatar")?.addEventListener("click", async () => {
+  const res = await api().profile_pick_avatar();
+  if (res.cancelled) return;
+  if (!res.ok) return toast(res.error, true);
+
+  profile.avatar = res.avatar;
+  renderAvatar(res.avatar, $("profile-nick")?.value);
+  toast("foto escolhida — clique em salvar");
+});
+
+$("profile-save")?.addEventListener("click", async () => {
+  const btn = $("profile-save");
+  btn.disabled = true;
+  btn.textContent = "Salvando...";
+
+  const res = await api().profile_save(
+    $("profile-nick")?.value || "",
+    $("profile-bio")?.value || "",
+    profile.avatar,          // null mantém a foto atual
+  );
+
+  btn.disabled = false;
+  btn.textContent = "Salvar perfil";
+
+  if (!res.ok) return toast(res.error, true);
+  profile.avatar = null;
+  profile.data = res.profile;
+  toast("perfil salvo");
+  if (room.id) refreshMembers();
+});
+
+/* ===== Notificações de mensagem ===== */
+
+/** Bipe curto, gerado na hora — evita carregar arquivo de som. */
+function playNotificationSound() {
+  let quer = true;
+  try { quer = localStorage.getItem("aptplayer-notify-sound") !== "off"; } catch {}
+  if (!quer) return;
+
+  try {
+    const Ctx = window.AudioContext || window.webkitAudioContext;
+    const ctx = new Ctx();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc.type = "sine";
+    osc.frequency.setValueAtTime(880, ctx.currentTime);
+    osc.frequency.setValueAtTime(1180, ctx.currentTime + 0.09);
+
+    gain.gain.setValueAtTime(0.0001, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.25, ctx.currentTime + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.3);
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start();
+    osc.stop(ctx.currentTime + 0.32);
+    // fecha o contexto para não acumular recursos
+    setTimeout(() => ctx.close().catch(() => {}), 600);
+  } catch {
+    // sem áudio disponível: a notificação visual ainda aparece
+  }
+}
+
+/** Avisa sobre uma mensagem nova que não é sua. */
+function notifyMessage(m) {
+  let quer = true;
+  try { quer = localStorage.getItem("aptplayer-notify") !== "off"; } catch {}
+  if (!quer || m.mine) return;
+
+  const corpo = m.body || (m.track ? `enviou ${m.track.title}` : "");
+  api().notify(`${m.nickname} · ${room.name}`, corpo);
+  playNotificationSound();
+}
+
+$("notify-toggle")?.addEventListener("change", (ev) => {
+  try {
+    localStorage.setItem("aptplayer-notify", ev.target.checked ? "on" : "off");
+  } catch {}
+  toast(ev.target.checked ? "notificações ligadas" : "notificações desligadas");
+  if (ev.target.checked) {
+    api().notify("AptPlayer", "as notificações estão funcionando");
+    playNotificationSound();
+  }
+});
+
+$("notify-sound")?.addEventListener("change", (ev) => {
+  try {
+    localStorage.setItem("aptplayer-notify-sound", ev.target.checked ? "on" : "off");
+  } catch {}
+  if (ev.target.checked) playNotificationSound();
+});
+
+function initNotifyToggles() {
+  try {
+    const t = $("notify-toggle");
+    const s = $("notify-sound");
+    if (t) t.checked = localStorage.getItem("aptplayer-notify") !== "off";
+    if (s) s.checked = localStorage.getItem("aptplayer-notify-sound") !== "off";
+  } catch {}
 }

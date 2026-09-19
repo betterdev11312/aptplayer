@@ -1,10 +1,11 @@
 package com.aptplayer.app
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
@@ -20,6 +21,8 @@ import com.aptplayer.app.databinding.ItemTrackBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+
+private const val TAG = "AptPlayer"
 
 @UnstableApi
 class MainActivity : AppCompatActivity() {
@@ -44,12 +47,13 @@ class MainActivity : AppCompatActivity() {
                 )
             }
 
-            override fun onMediaItemTransition(item: MediaItem?, reason: Int) {
-                // quando a faixa acaba, segue para a próxima da lista
-                val index = queue.indexOfFirst { it.videoId == current?.videoId }
-                if (index >= 0 && index + 1 < queue.size) {
-                    play(queue[index + 1])
-                }
+            override fun onPlaybackStateChanged(state: Int) {
+                if (state == Player.STATE_ENDED) skip(1)
+            }
+
+            override fun onPlayerError(error: androidx.media3.common.PlaybackException) {
+                Log.e(TAG, "erro de reproducao", error)
+                ui.nowArtist.text = "erro ao tocar — tente outra faixa"
             }
         })
 
@@ -58,11 +62,16 @@ class MainActivity : AppCompatActivity() {
 
         ui.searchInput.setOnEditorActionListener { view, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                esconderTeclado()
                 search(view.text.toString())
                 true
             } else {
                 false
             }
+        }
+        ui.searchButton.setOnClickListener {
+            esconderTeclado()
+            search(ui.searchInput.text.toString())
         }
 
         ui.playPause.setOnClickListener {
@@ -70,40 +79,91 @@ class MainActivity : AppCompatActivity() {
         }
         ui.next.setOnClickListener { skip(1) }
         ui.previous.setOnClickListener { skip(-1) }
+
+        mostrarEstado("busque uma música para começar", carregando = false)
+    }
+
+    private fun esconderTeclado() {
+        val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.hideSoftInputFromWindow(ui.searchInput.windowToken, 0)
+    }
+
+    private fun mostrarEstado(texto: String, carregando: Boolean) {
+        ui.status.text = texto
+        ui.status.isVisible = true
+        ui.progress.isVisible = carregando
+        ui.results.isVisible = false
+    }
+
+    private fun mostrarResultados(lista: List<YouTube.Track>) {
+        adapter.submit(lista)
+        ui.status.isVisible = false
+        ui.progress.isVisible = false
+        ui.results.isVisible = true
     }
 
     private fun search(query: String) {
         if (query.isBlank()) return
-
-        ui.status.text = getString(R.string.searching)
-        ui.status.isVisible = true
+        mostrarEstado("buscando \"$query\"...", carregando = true)
 
         lifecycleScope.launch {
-            val found = withContext(Dispatchers.IO) {
-                runCatching { YouTube.search(query, 25) }.getOrElse { emptyList() }
+            // O erro precisa chegar até aqui: engolir a exceção deixava a tela
+            // vazia sem explicação nenhuma.
+            val resultado = withContext(Dispatchers.IO) {
+                try {
+                    Result.success(YouTube.search(query, 25))
+                } catch (exc: Exception) {
+                    Log.e(TAG, "falha na busca", exc)
+                    Result.failure(exc)
+                }
             }
-            queue = found
-            adapter.submit(found)
-            ui.status.isVisible = found.isEmpty()
-            if (found.isEmpty()) ui.status.text = getString(R.string.no_results)
+
+            resultado.fold(
+                onSuccess = { lista ->
+                    queue = lista
+                    if (lista.isEmpty()) {
+                        mostrarEstado(
+                            "nenhuma música encontrada para \"$query\"",
+                            carregando = false,
+                        )
+                    } else {
+                        mostrarResultados(lista)
+                    }
+                },
+                onFailure = { erro ->
+                    mostrarEstado(
+                        "não consegui buscar.\n${erro.javaClass.simpleName}: " +
+                            (erro.message ?: "sem detalhes"),
+                        carregando = false,
+                    )
+                },
+            )
         }
     }
 
     private fun play(track: YouTube.Track) {
         current = track
         ui.nowTitle.text = track.title
-        ui.nowArtist.text = track.artist
+        ui.nowArtist.text = "carregando..."
         ui.nowArt.load(track.thumbnail)
         ui.playerBar.isVisible = true
 
         lifecycleScope.launch {
             val url = withContext(Dispatchers.IO) {
-                runCatching { YouTube.audioUrl(track.videoId) }.getOrNull()
+                try {
+                    YouTube.audioUrl(track.videoId)
+                } catch (exc: Exception) {
+                    Log.e(TAG, "falha ao resolver audio", exc)
+                    null
+                }
             }
+
             if (url == null) {
                 ui.nowArtist.text = "não consegui tocar esta faixa"
                 return@launch
             }
+
+            ui.nowArtist.text = track.artist
             player.setMediaItem(MediaItem.fromUri(url))
             player.prepare()
             player.play()
@@ -112,8 +172,8 @@ class MainActivity : AppCompatActivity() {
 
     private fun skip(delta: Int) {
         val index = queue.indexOfFirst { it.videoId == current?.videoId }
-        val next = index + delta
-        if (index >= 0 && next in queue.indices) play(queue[next])
+        val proximo = index + delta
+        if (index >= 0 && proximo in queue.indices) play(queue[proximo])
     }
 
     override fun onDestroy() {

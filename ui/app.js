@@ -204,6 +204,10 @@ function markPlaying() {
 /* ===== Player ===== */
 
 async function playTrack(track, list = null) {
+  // Para qualquer transicao em andamento: sem isto, trocar de faixa no meio
+  // de um crossfade deixa duas musicas tocando ao mesmo tempo.
+  if (typeof stopAll === "function") stopAll();
+
   if (list) {
     state.queue = list.slice();
     state.index = list.findIndex((t) => t.video_id === track.video_id);
@@ -297,7 +301,13 @@ function playPrev() {
 
 $("btn-play").addEventListener("click", () => {
   if (!state.queue.length) return;
-  audio.paused ? audio.play() : audio.pause();
+  if (audio.paused) {
+    audio.play();
+  } else {
+    // pausa tambem o elemento da transicao, se houver
+    if (typeof stopAll === "function") stopAll();
+    else audio.pause();
+  }
 });
 $("btn-next").addEventListener("click", () => { catOn.skip(); playNext(false); });
 $("btn-prev").addEventListener("click", playPrev);
@@ -326,7 +336,12 @@ function bindAudioEvents(el) {
   });
   el.addEventListener("ended", () => playNext(true));
   el.addEventListener("error", () => {
-    if (el.src) toast("Erro ao reproduzir o áudio.", true);
+    if (!el.src) return;
+    // Silencia este elemento antes de qualquer outra coisa: um erro no meio
+    // da transicao deixava a faixa anterior tocando por baixo.
+    try { el.pause(); } catch {}
+    if (typeof fadeCancel === "function") fadeCancel();
+    toast("Erro ao reproduzir o áudio.", true);
   });
   el.addEventListener("timeupdate", () => {
     const pct = el.duration ? (el.currentTime / el.duration) * 100 : 0;
@@ -1047,6 +1062,8 @@ function initSettings() {
   loadAccount();
   initAudioSettings();
   loadDiscord();
+  initNotifyToggles();
+  loadProfile();
   const toggle = $("cat-toggle");
   if (toggle) {
     try { toggle.checked = localStorage.getItem("aptplayer-cat") !== "off"; }

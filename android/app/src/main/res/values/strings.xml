@@ -6,4 +6,5 @@
     <string name="searching">Buscando…</string>
     <string name="no_results">Nenhuma música encontrada</string>
     <string name="offline">Sem conexão</string>
+    <string name="music_only">// FILTRO DE MUSICA ATIVO</string>
 </resources>
