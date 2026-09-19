@@ -8,7 +8,8 @@ from pathlib import Path
 
 from . import (account, ai, autoupdate, cache, discover, hotkeys, library,
                lyrics,
-               radio, share, spotify, stats, translate, updater, youtube)
+               radio, rooms, share, spotify, stats, translate, updater,
+               youtube)
 from .paths import COVERS_DIR
 
 
@@ -725,3 +726,36 @@ class Api:
 
     def auto_update_progress(self) -> dict:
         return {"ok": True, **autoupdate.state()}
+
+    # --- salas de chat ----------------------------------------------------
+
+    def room_create(self, name: str) -> dict:
+        return rooms.create(name)
+
+    def room_join(self, code: str) -> dict:
+        return rooms.join(code)
+
+    def room_leave(self, room_id: str) -> dict:
+        return rooms.leave(room_id)
+
+    def room_list(self) -> dict:
+        return rooms.my_rooms()
+
+    def room_members(self, room_id: str) -> dict:
+        return rooms.members(room_id)
+
+    def room_heartbeat(self, room_id: str, now_playing: dict = None) -> dict:
+        return rooms.heartbeat(room_id, now_playing)
+
+    def room_send(self, room_id: str, body: str = "", track: dict = None) -> dict:
+        return rooms.send(room_id, body, track)
+
+    def room_history(self, room_id: str, after_id: int = 0) -> dict:
+        return rooms.history(room_id, int(after_id or 0))
+
+    def room_set_playback(self, room_id: str, track: dict, position: float,
+                          playing: bool) -> dict:
+        return rooms.set_playback(room_id, track, position, playing)
+
+    def room_get_playback(self, room_id: str) -> dict:
+        return rooms.get_playback(room_id)

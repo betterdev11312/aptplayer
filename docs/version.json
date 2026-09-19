@@ -1,6 +1,6 @@
 {
-  "version": "1.5.0",
-  "url": "https://github.com/betterdev11312/aptplayer/releases/download/v1.5.0/AptPlayer-Setup.exe",
-  "exe": "https://github.com/betterdev11312/aptplayer/releases/download/v1.5.0/AptPlayer.exe",
-  "notes": "Atualizacao automatica: o app baixa e instala sozinho, sem passar pelo navegador."
+  "version": "1.6.0",
+  "url": "https://github.com/betterdev11312/aptplayer/releases/download/v1.6.0/AptPlayer-Setup.exe",
+  "exe": "https://github.com/betterdev11312/aptplayer/releases/download/v1.6.0/AptPlayer.exe",
+  "notes": "Chat entre amigos: salas privadas com codigo, ver o que cada um ouve, enviar musicas e ouvir junto sincronizado."
 }

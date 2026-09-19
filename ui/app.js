@@ -109,6 +109,7 @@ function showView(name) {
   if (name === "chat") initChat();
   if (name === "settings") initSettings();
   if (name === "stats") loadStats();
+  if (name === "rooms") { initRoomsOnce(); loadRooms(); }
 }
 
 document.querySelectorAll(".nav-item").forEach((btn) =>
@@ -1618,4 +1619,21 @@ $("close-spotify")?.addEventListener("click", () => {
 });
 $("spotify-url")?.addEventListener("keydown", (ev) => {
   if (ev.key === "Enter") $("spotify-btn").click();
+});
+
+
+/* o chat so e inicializado quando a aba e aberta pela primeira vez */
+let roomsReady = false;
+function initRoomsOnce() {
+  if (roomsReady) return;
+  roomsReady = true;
+  initRooms();
+}
+
+/* avisa a sala quando a reproducao muda, no modo ouvir junto */
+audio.addEventListener("play", () => {
+  if (typeof pushPlayback === "function") pushPlayback();
+});
+audio.addEventListener("pause", () => {
+  if (typeof pushPlayback === "function") pushPlayback();
 });
