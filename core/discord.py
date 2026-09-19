@@ -19,7 +19,7 @@ import time
 
 # Application ID do portal (https://discord.com/developers/applications).
 # E publico - aparece no perfil de quem usa o app.
-APP_ID = ""
+APP_ID = "1550665978030067783"
 
 # Chaves das imagens enviadas em Rich Presence > Art Assets, no portal.
 LARGE_IMAGE = "logo"        # capa grande
