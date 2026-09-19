@@ -36,3 +36,12 @@ docs/*.zip
 
 # Token do GitHub (nunca versionar)
 .github-token
+
+# --- Android ---
+android/.gradle/
+android/local.properties
+android/app/build/
+android/build/
+android/.idea/
+*.apk
+*.aab

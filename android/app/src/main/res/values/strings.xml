@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">AptPlayer</string>
+    <string name="search_hint">artista, música ou link</string>
+    <string name="nothing_playing">Nada tocando</string>
+    <string name="searching">Buscando…</string>
+    <string name="no_results">Nenhuma música encontrada</string>
+    <string name="offline">Sem conexão</string>
+</resources>

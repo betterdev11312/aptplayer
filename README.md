@@ -275,6 +275,15 @@ Código no GitHub: **https://github.com/betterdev11312/aptplayer**
 
 Fluxo de trabalho e detalhes em [GITHUB.md](GITHUB.md).
 
+## Android
+
+Existe uma versão nativa para Android em [android/](android/), em Kotlin.
+Ela usa o NewPipeExtractor no lugar do yt-dlp (Android não tem Python) e
+funciona sozinha, sem depender do PC.
+
+O código está pronto mas ainda não foi compilado — veja [ANDROID.md](ANDROID.md)
+para o passo a passo.
+
 ## Notas
 
 - **Streams expiram.** As URLs do YouTube valem algumas horas; o app resolve
