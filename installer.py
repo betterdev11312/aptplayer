@@ -20,10 +20,21 @@ from pathlib import Path
 import webview
 
 APP_NAME = "AptPlayer"
-APP_VERSION = "1.6.0"
+APP_VERSION = "1.6.1"
 PUBLISHER = "AptPlayer"
 EXE_NAME = "AptPlayer.exe"
 REG_KEY = rf"Software\Microsoft\Windows\CurrentVersion\Uninstall\{APP_NAME}"
+
+
+def _trace(msg: str) -> None:
+    """Marca o progresso num arquivo - o console nao aparece no modo windowed."""
+    try:
+        import tempfile
+        path = Path(tempfile.gettempdir()) / "aptplayer_setup_trace.log"
+        with open(path, "a", encoding="utf-8") as fh:
+            fh.write(time.strftime("%H:%M:%S") + " " + msg + chr(10))
+    except Exception:
+        pass
 
 
 def resource(name: str) -> Path:
@@ -127,11 +138,15 @@ def write_uninstaller(folder: Path) -> None:
         pass
 
 
+# A janela fica FORA da classe: qualquer atributo da API e inspecionado pelo
+# pywebview, e um objeto nativo ali trava a interface com recursao infinita.
+_window = None
+
+
 class InstallerApi:
     """Ponte com a interface do instalador."""
 
     def __init__(self):
-        self.window = None
         self._lock = threading.Lock()
         self._progress = {
             "running": False, "done": False, "ok": False,
@@ -139,6 +154,7 @@ class InstallerApi:
         }
 
     def get_info(self) -> dict:
+        _trace("get_info chamado")
         return {
             "name": APP_NAME,
             "version": APP_VERSION,
@@ -266,8 +282,8 @@ class InstallerApi:
         shutil.copystat(source, target)
 
     def close(self) -> dict:
-        if self.window:
-            self.window.destroy()
+        if _window:
+            _window.destroy()
         return {"ok": True}
 
 
@@ -386,6 +402,7 @@ $('go').addEventListener('click', async () => {
 
 
 def main():
+    _trace("main inicio")
     tmp = Path(os.environ.get("TEMP", ".")) / "aptplayer_installer.html"
     tmp.write_text(HTML, encoding="utf-8")
 
@@ -397,18 +414,25 @@ def main():
         except OSError:
             pass
 
+    _trace("html escrito")
+    global _window
     api = InstallerApi()
+    _trace("api criada")
     window = webview.create_window(
         f"Instalar {APP_NAME}", str(tmp), js_api=api,
         width=520, height=640, resizable=False, background_color="#05060a",
     )
-    api.window = window
+    _window = window
+    _trace("janela criada")
     icon = resource("app.ico")
     kwargs = {"icon": str(icon)} if icon.exists() else {}
+    _trace(f"iniciando webview kwargs={list(kwargs)}")
     try:
         webview.start(**kwargs)
     except TypeError:
+        _trace("TypeError no start; tentando sem icon")
         webview.start()
+    _trace("webview terminou")
 
 
 if __name__ == "__main__":

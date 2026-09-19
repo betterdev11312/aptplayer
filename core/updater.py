@@ -12,7 +12,7 @@ import requests
 
 from .paths import DATA_DIR
 
-VERSION = "1.6.0"
+VERSION = "1.6.1"
 
 # Site do projeto (Cloudflare Workers). Deixe vazio para desligar a verificacao.
 SITE_URL = "https://betterdev11312.github.io/aptplayer"
