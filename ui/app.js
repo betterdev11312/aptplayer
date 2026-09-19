@@ -1012,6 +1012,7 @@ function initSettings() {
   loadAbout();
   loadAccount();
   initAudioSettings();
+  loadDiscord();
   const toggle = $("cat-toggle");
   if (toggle) {
     try { toggle.checked = localStorage.getItem("aptplayer-cat") !== "off"; }
@@ -1637,3 +1638,81 @@ audio.addEventListener("play", () => {
 audio.addEventListener("pause", () => {
   if (typeof pushPlayback === "function") pushPlayback();
 });
+
+
+/* ===== Discord Rich Presence ===== */
+
+const discord = { on: false, lastId: null };
+
+async function loadDiscord() {
+  const res = await api().discord_status();
+  const desc = $("discord-desc");
+  const toggle = $("discord-toggle");
+  if (!desc || !toggle) return;
+
+  if (!res.configured) {
+    desc.innerHTML =
+      "Falta o Application ID do Discord. O passo a passo está no arquivo " +
+      "<strong>DISCORD.md</strong>, na pasta do projeto — leva uns 5 minutos.";
+    toggle.disabled = true;
+    toggle.checked = false;
+    return;
+  }
+
+  toggle.disabled = false;
+  desc.textContent = res.discord_running
+    ? "Mostra a música que você está ouvindo no seu perfil do Discord."
+    : "Abra o Discord para o status aparecer.";
+
+  let want = false;
+  try { want = localStorage.getItem("aptplayer-discord") === "on"; } catch {}
+  toggle.checked = want;
+  discord.on = want;
+  if (want) api().discord_enable();
+}
+
+$("discord-toggle")?.addEventListener("change", async (ev) => {
+  if (ev.target.checked) {
+    const res = await api().discord_enable();
+    if (!res.ok) {
+      ev.target.checked = false;
+      return toast(res.error, true);
+    }
+    discord.on = true;
+    try { localStorage.setItem("aptplayer-discord", "on"); } catch {}
+    toast("Discord conectado");
+    pushDiscord();
+  } else {
+    await api().discord_disable();
+    discord.on = false;
+    discord.lastId = null;
+    try { localStorage.setItem("aptplayer-discord", "off"); } catch {}
+    toast("Rich Presence desligado");
+  }
+});
+
+/** Envia ao Discord o que está tocando agora. */
+function pushDiscord() {
+  if (!discord.on) return;
+  const track = state.queue[state.index];
+  if (!track) {
+    api().discord_update(null, false, 0, 0);
+    discord.lastId = null;
+    return;
+  }
+  api().discord_update(
+    { video_id: track.video_id, title: track.title, artist: track.artist },
+    !audio.paused,
+    audio.currentTime || 0,
+    audio.duration || track.duration || 0,
+  );
+  discord.lastId = track.video_id;
+}
+
+audio.addEventListener("play", pushDiscord);
+audio.addEventListener("pause", pushDiscord);
+
+/* o Discord limita atualizações; uma a cada 15s é suficiente e seguro */
+setInterval(() => {
+  if (discord.on && !audio.paused) pushDiscord();
+}, 15000);

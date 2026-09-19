@@ -1,6 +1,6 @@
 {
-  "version": "1.6.1",
-  "url": "https://github.com/betterdev11312/aptplayer/releases/download/v1.6.1/AptPlayer-Setup.exe",
-  "exe": "https://github.com/betterdev11312/aptplayer/releases/download/v1.6.1/AptPlayer.exe",
-  "notes": "Corrige o travamento do instalador."
+  "version": "1.7.0",
+  "url": "https://github.com/betterdev11312/aptplayer/releases/download/v1.7.0/AptPlayer-Setup.exe",
+  "exe": "https://github.com/betterdev11312/aptplayer/releases/download/v1.7.0/AptPlayer.exe",
+  "notes": "Rich Presence no Discord e correcao do instalador."
 }

@@ -6,10 +6,10 @@ window.pywebview.api.<nome>(...).
 
 from pathlib import Path
 
-from . import (account, ai, autoupdate, cache, discover, hotkeys, library,
-               lyrics,
-               radio, rooms, share, spotify, stats, translate, updater,
-               youtube)
+from . import (account, ai, autoupdate, cache, discord, discover, hotkeys,
+               library,
+               lyrics, radio, rooms, share, spotify, stats, translate,
+               updater, youtube)
 from .paths import COVERS_DIR
 
 
@@ -759,3 +759,30 @@ class Api:
 
     def room_get_playback(self, room_id: str) -> dict:
         return rooms.get_playback(room_id)
+
+    # --- Discord Rich Presence --------------------------------------------
+
+    def discord_status(self) -> dict:
+        return {"ok": True, **discord.status()}
+
+    def discord_enable(self) -> dict:
+        if not discord.is_configured():
+            return {"ok": False,
+                    "error": "Falta o Application ID. Veja DISCORD.md."}
+        ok = discord.connect()
+        return {"ok": ok, "connected": ok,
+                "error": "" if ok else "O Discord precisa estar aberto."}
+
+    def discord_disable(self) -> dict:
+        discord.disconnect()
+        return {"ok": True}
+
+    def discord_update(self, track: dict = None, playing: bool = True,
+                       position: float = 0, duration: float = 0) -> dict:
+        """Atualiza o status. Falha em silencio: nunca atrapalha o player."""
+        try:
+            discord.set_activity(track, bool(playing),
+                                 float(position or 0), float(duration or 0))
+        except Exception:
+            pass
+        return {"ok": True}
