@@ -786,3 +786,34 @@ class Api:
         except Exception:
             pass
         return {"ok": True}
+
+    # --- janela sem moldura -----------------------------------------------
+
+    def window_minimize(self) -> dict:
+        window = self._window()
+        if window:
+            window.minimize()
+        return {"ok": True}
+
+    def window_toggle_max(self) -> dict:
+        """Alterna entre maximizada e restaurada."""
+        window = self._window()
+        if not window:
+            return {"ok": False}
+        try:
+            if getattr(window, "maximized", False):
+                window.restore()
+                return {"ok": True, "maximized": False}
+            window.maximize()
+            return {"ok": True, "maximized": True}
+        except Exception:
+            # algumas versoes nao expoem 'maximized': alterna pelo estado guardado
+            self._maxed = not getattr(self, "_maxed", False)
+            (window.maximize if self._maxed else window.restore)()
+            return {"ok": True, "maximized": self._maxed}
+
+    def window_close(self) -> dict:
+        window = self._window()
+        if window:
+            window.destroy()
+        return {"ok": True}

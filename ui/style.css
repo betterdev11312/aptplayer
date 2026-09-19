@@ -1341,3 +1341,66 @@ body.cat-menu-open .cat-bubble { opacity: 0; }
   .room-main { grid-template-columns: 1fr; }
   .room-people { display: none; }
 }
+
+
+/* ==================== BARRA DE TITULO PROPRIA ==================== */
+:root { --tb-h: 34px; }
+
+.titlebar {
+  position: fixed; top: 0; left: 0; right: 0; height: var(--tb-h);
+  z-index: 500;
+  display: flex; align-items: center; justify-content: space-between;
+  background: var(--bg-deep);
+  border-bottom: 1px solid var(--line);
+  user-select: none;
+}
+.titlebar::after {
+  content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--yellow), var(--cyan), transparent);
+  opacity: .4;
+}
+
+/* a area de arrastar cobre tudo menos os botoes */
+.tb-drag {
+  flex: 1; height: 100%; display: flex; align-items: center; gap: 9px;
+  padding-left: 11px; min-width: 0;
+  -webkit-app-region: drag;   /* usado pelo webview para mover a janela */
+  cursor: default;
+}
+.tb-icon { width: 17px; height: 17px; flex-shrink: 0; }
+.tb-name {
+  font-family: var(--display, var(--font));
+  font-size: 12px; font-weight: 700; letter-spacing: 1.6px;
+  text-transform: uppercase; color: var(--text-dim);
+  flex-shrink: 0;
+}
+.tb-now {
+  font-family: var(--mono); font-size: 11px; color: var(--text-faint);
+  margin-left: 10px; min-width: 0;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.tb-now::before { content: "// "; color: var(--cyan); }
+.tb-now:empty { display: none; }
+
+.tb-buttons { display: flex; height: 100%; -webkit-app-region: no-drag; }
+.tb-btn {
+  width: 44px; height: 100%; border: none; background: none;
+  color: var(--text-dim); cursor: pointer;
+  display: grid; place-items: center;
+  transition: background .12s, color .12s;
+}
+.tb-btn svg {
+  width: 12px; height: 12px; fill: none; stroke: currentColor;
+  stroke-width: 1.4;
+}
+.tb-btn#tb-max svg { fill: none; }
+.tb-btn:hover { background: var(--hover); color: var(--text); }
+.tb-btn.danger:hover { background: var(--magenta); color: #fff; }
+
+/* tudo desce para caber a barra */
+body { padding-top: var(--tb-h); }
+.app { height: calc(100vh - var(--player-h) - var(--tb-h)); }
+.app, .main { max-height: calc(100vh - var(--player-h) - var(--tb-h)); }
+.chat-wrap { height: calc(100vh - var(--player-h) - var(--tb-h) - 190px); }
+.rooms-layout { height: calc(100vh - var(--player-h) - var(--tb-h) - 190px); }
+.lyrics-panel { height: calc(100vh - var(--player-h) - var(--tb-h) - 40px); }

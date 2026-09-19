@@ -255,6 +255,7 @@ function onTrackStarted(track) {
   api().play_started(track);
   updateFavButton(track);
   updateMediaSession(track);
+  updateTitlebar(track);
   if (typeof lyrics !== "undefined" && lyrics.open) loadLyrics(track);
   catOn.play(track, (track.play_count || 0) >= 2);
   renderQueue();
@@ -1716,3 +1717,30 @@ audio.addEventListener("pause", pushDiscord);
 setInterval(() => {
   if (discord.on && !audio.paused) pushDiscord();
 }, 15000);
+
+
+/* ===== Barra de titulo propria ===== */
+
+$("tb-min")?.addEventListener("click", () => api().window_minimize());
+$("tb-close")?.addEventListener("click", () => api().window_close());
+
+$("tb-max")?.addEventListener("click", async () => {
+  const res = await api().window_toggle_max();
+  const btn = $("tb-max");
+  // icone muda para indicar que da para restaurar
+  btn.innerHTML = res.maximized
+    ? `<svg viewBox="0 0 12 12"><rect x="2" y="4" width="6" height="6"/><path d="M4 4V2h6v6H8"/></svg>`
+    : `<svg viewBox="0 0 12 12"><rect x="2.5" y="2.5" width="7" height="7"/></svg>`;
+});
+
+/* duplo clique na barra maximiza, como no Windows */
+document.querySelector(".tb-drag")?.addEventListener("dblclick", () => {
+  $("tb-max")?.click();
+});
+
+/** Mostra a faixa atual na barra de titulo. */
+function updateTitlebar(track) {
+  const el = $("tb-now");
+  if (!el) return;
+  el.textContent = track ? `${track.artist} - ${track.title}` : "";
+}

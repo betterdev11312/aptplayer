@@ -11,6 +11,26 @@
 </head>
 <body>
 
+<!-- ===== BARRA DE TITULO ===== -->
+<div class="titlebar" id="titlebar">
+  <div class="tb-drag">
+    <img src="../icon/app.png" alt="" class="tb-icon" onerror="this.style.display='none'">
+    <span class="tb-name">AptPlayer</span>
+    <span class="tb-now" id="tb-now"></span>
+  </div>
+  <div class="tb-buttons">
+    <button class="tb-btn" id="tb-min" title="Minimizar">
+      <svg viewBox="0 0 12 12"><path d="M2 6h8"/></svg>
+    </button>
+    <button class="tb-btn" id="tb-max" title="Maximizar">
+      <svg viewBox="0 0 12 12"><rect x="2.5" y="2.5" width="7" height="7"/></svg>
+    </button>
+    <button class="tb-btn danger" id="tb-close" title="Fechar">
+      <svg viewBox="0 0 12 12"><path d="M3 3l6 6M9 3l-6 6"/></svg>
+    </button>
+  </div>
+</div>
+
 <div class="app">
 
   <!-- ===== SIDEBAR ===== -->
@@ -582,7 +602,7 @@
 <div id="toast" class="toast"></div>
 <div id="modal-root"></div>
 
-<script>window.__errs=[];window.addEventListener("error",e=>window.__errs.push((e.message||"")+" @"+String(e.filename||"").split("/").pop()+":"+e.lineno));</script>
+<script>window.__errs=[];window.addEventListener("error",e=>{window.__errs.push((e.message||"")+" @"+String(e.filename||"").split("/").pop()+":"+e.lineno+(e.error&&e.error.stack?" | "+String(e.error.stack).split(String.fromCharCode(10))[0]:""))},true);</script>
 <script src="i18n.js"></script>
 <script src="mascot-lines.js"></script>
 <script src="mascot.js"></script>

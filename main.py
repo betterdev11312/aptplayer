@@ -158,6 +158,9 @@ def main():
         height=820,
         min_size=(940, 620),
         background_color="#05060a",
+        # Sem a barra do Windows: a interface desenha a propria, no tema.
+        frameless=True,
+        easy_drag=False,      # so a barra customizada arrasta a janela
     )
 
     def on_start():
