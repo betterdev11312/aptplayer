@@ -33,3 +33,6 @@ desktop.ini
 # Pacotes do site (grandes)
 site/*.zip
 docs/*.zip
+
+# Token do GitHub (nunca versionar)
+.github-token

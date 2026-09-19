@@ -18,6 +18,29 @@ Em um ou dois minutos o site fica no ar em:
 
 ## 2. Publicar os executáveis
 
+### Pelo script (recomendado)
+
+O upload pelo site do GitHub falha com frequência em arquivos de 36 MB —
+o navegador corta a conexão no meio. Use o script:
+
+```bash
+python tools_release.py
+```
+
+Ele cria o release, sobe os quatro arquivos pela API e repete sozinho se a
+conexão cair. Se algum falhar, rode de novo — ele continua de onde parou.
+
+Na primeira vez pede um token do GitHub:
+
+1. Abra **https://github.com/settings/tokens/new**
+2. *Note*: `aptplayer-release`
+3. Marque a caixa **repo**
+4. **Generate token** e copie (começa com `ghp_`)
+5. Cole quando o script pedir — ele guarda em `.github-token`, que já está
+   no `.gitignore`
+
+### Pelo site (se preferir)
+
 1. Abra **https://github.com/betterdev11312/aptplayer/releases/new**
 2. Preencha:
    - **Choose a tag**: digite `v1.3.0` e clique em *Create new tag*
